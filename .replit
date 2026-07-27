@@ -1,12 +1,15 @@
+run = "npm run dev"
+entrypoint = "src/app/page.tsx"
 modules = ["nodejs-20"]
 
-run = "npm install && node server.js"
-
-[agent]
-expertMode = true
-
 [nix]
-packages = ["mongodb"]
+channel = "stable-24_05"
+
+[env]
+NODE_OPTIONS = "--max-old-space-size=4096"
+
+[languages.typescript]
+pattern = "**/*.ts"
 
 [[ports]]
 localPort = 3000

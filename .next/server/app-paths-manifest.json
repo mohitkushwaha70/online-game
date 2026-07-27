@@ -1,0 +1,8 @@
+{
+  "/api/categories/route": "app/api/categories/route.js",
+  "/api/games/featured/route": "app/api/games/featured/route.js",
+  "/api/games/route": "app/api/games/route.js",
+  "/api/games/originals/route": "app/api/games/originals/route.js",
+  "/api/games/trending/route": "app/api/games/trending/route.js",
+  "/page": "app/page.js"
+}
