@@ -1,0 +1,13 @@
+modules = ["nodejs-20"]
+
+run = "npm install && node server.js"
+
+[agent]
+expertMode = true
+
+[nix]
+packages = ["mongodb"]
+
+[[ports]]
+localPort = 3000
+externalPort = 80
