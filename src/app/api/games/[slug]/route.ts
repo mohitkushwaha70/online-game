@@ -8,6 +8,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
     const { slug } = await params;
     const game = await Game.findOne({ slug, status: 'active' }).populate('category', 'name slug color');
     if (!game) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    return NextResponse.json({ game });
+    const res = NextResponse.json({ game });
+    res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    return res;
   } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 500 }); }
 }

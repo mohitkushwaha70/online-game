@@ -1,46 +1,50 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
+import { use } from 'react';
+import Link from 'next/link';
 import GameCard from '@/components/game/GameCard';
-
-interface Game {
-  _id: string; name: string; slug: string; category?: { name: string; slug: string; color: string };
-  totalPlays: number; totalLikes: number; rating: number; labels: string[]; isPremium: boolean; color: string;
-}
+import { Game } from '@/lib/types';
 
 export default function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
-  const [category, setCategory] = useState<any>(null);
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (slug === 'all') {
-      fetch('/api/games?limit=100').then(r => r.json()).then(d => { setGames(d.games || []); setLoading(false); });
-      setCategory({ name: 'All Games', slug: 'all' });
-    } else {
-      Promise.all([
-        fetch(`/api/categories/${slug}`).then(r => r.json()),
-        fetch(`/api/games?category=${slug}&limit=100`).then(r => r.json()),
-      ]).then(([c, g]) => { setCategory(c.category); setGames(g.games || []); setLoading(false); });
-    }
+    fetch(`/api/games?category=${slug}`)
+      .then(res => res.json())
+      .then(data => { setGames(data.games || []); setLoading(false); })
+      .catch(() => setLoading(false));
   }, [slug]);
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 py-6">
-      <div className="mb-8">
-        <h1 className="font-heading text-3xl font-bold">{category?.name || 'Loading...'}</h1>
-        <p className="text-white/40 mt-1">{games.length} games available</p>
+    <div className="min-h-screen bg-dark-950 px-4 py-8 sm:py-12">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center gap-2 text-sm text-gray-400 mb-3 flex-wrap">
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <span>/</span>
+            <span className="text-white capitalize">{slug}</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white capitalize">{slug} Games</h1>
+          <p className="text-sm sm:text-base text-gray-400 mt-2">Browse the best {slug} games</p>
+        </div>
+        {loading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+            {Array.from({ length: 10 }).map((_, i) => <div key={i} className="skeleton aspect-[3/4] rounded-xl" />)}
+          </div>
+        ) : games.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-gray-400 text-lg mb-4">No games found in this category</p>
+            <Link href="/" className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors min-h-[44px] inline-flex items-center">Browse All Games</Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+            {games.map((game) => <GameCard key={game._id} game={game} />)}
+          </div>
+        )}
       </div>
-      {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {Array.from({ length: 12 }).map((_, i) => <div key={i} className="skeleton aspect-[16/9] rounded-2xl" />)}
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {games.map(g => <GameCard key={g._id} game={g} />)}
-        </div>
-      )}
     </div>
   );
 }

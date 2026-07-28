@@ -18,7 +18,11 @@ export async function GET(req: NextRequest) {
     if (search) query.$text = { $search: search };
     const games = await Game.find(query).populate('category', 'name slug color').sort(sort).skip((p - 1) * l).limit(l);
     const total = await Game.countDocuments(query);
-    return NextResponse.json({ games, total, page: p, pages: Math.ceil(total / l) });
+    const response = NextResponse.json({ games, total, page: p, pages: Math.ceil(total / l) });
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    return response;
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

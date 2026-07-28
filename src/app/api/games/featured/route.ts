@@ -6,6 +6,8 @@ export async function GET() {
   try {
     await connectDB();
     const games = await Game.find({ status: 'active', isFeatured: true }).populate('category', 'name slug color').sort('-totalPlays').limit(20);
-    return NextResponse.json({ games });
+    const res = NextResponse.json({ games });
+    res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    return res;
   } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 500 }); }
 }

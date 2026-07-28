@@ -1,106 +1,110 @@
 'use client';
 
-import { useAuth } from '@/lib/auth-context';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { UserAvatar, formatNumber } from '@/lib/utils';
+import Link from 'next/link';
+import { useAuth } from '@/lib/auth-context';
+import { Game } from '@/lib/types';
 
 export default function ProfilePage() {
-  const { user, token, loading } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
-  const [tab, setTab] = useState<'overview' | 'achievements' | 'stats'>('overview');
+  const [favorites, setFavorites] = useState<Game[]>([]);
+  const [recentGames, setRecentGames] = useState<Game[]>([]);
+  const [activeTab, setActiveTab] = useState<'favorites' | 'recent'>('favorites');
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => { if (!loading && !user) router.push('/login'); }, [user, loading]);
+  useEffect(() => {
+    if (!user) { router.push('/login'); return; }
+    const fetchData = async () => {
+      try {
+        const [favRes, recentRes] = await Promise.all([
+          fetch('/api/user/favorites'),
+          fetch('/api/user/recent'),
+        ]);
+        const [favData, recentData] = await Promise.all([favRes.json(), recentRes.json()]);
+        setFavorites(favData.favorites || favData || []);
+        setRecentGames(recentData.recent || recentData || []);
+      } catch {}
+      setLoading(false);
+    };
+    fetchData();
+  }, [user, router]);
 
-  if (loading || !user) return <div className="min-h-[80vh] flex items-center justify-center"><div className="skeleton w-48 h-8" /></div>;
+  if (!user) return null;
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 py-8">
-      {/* Profile Header */}
-      <div className="glass rounded-2xl p-8 mb-8">
-        <div className="flex flex-col sm:flex-row items-center gap-6">
-          <UserAvatar name={user.displayName || user.username} src={user.avatar} size={80} />
-          <div className="text-center sm:text-left flex-1">
-            <h1 className="font-heading text-2xl font-bold">{user.displayName || user.username}</h1>
-            <p className="text-white/40 text-sm">{user.email}</p>
-            <div className="flex gap-4 mt-2 justify-center sm:justify-start">
-              <span className="text-sm text-yellow-400">🪙 {formatNumber(user.coins)} coins</span>
-              <span className="text-sm text-blue-400">⚡ {formatNumber(user.xp)} XP</span>
-              <span className="text-sm text-purple-400">Level {user.level}</span>
+    <div className="min-h-screen bg-dark-950 px-4 py-8 sm:py-12">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6 lg:p-8 mb-8">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-3xl font-black text-white flex-shrink-0">
+              {user.username?.[0]?.toUpperCase() || 'U'}
+            </div>
+            <div className="text-center sm:text-left flex-1 min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold text-white truncate">{user.username}</h1>
+              <p className="text-sm text-gray-400 truncate">{user.email}</p>
+              {user.role === 'admin' && (
+                <span className="inline-block mt-2 px-3 py-1 bg-purple-500/20 text-purple-400 text-xs font-medium rounded-full border border-purple-500/30">Admin</span>
+              )}
             </div>
           </div>
-          {user.premium?.isActive && (
-            <div className="px-4 py-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-xl text-yellow-400 text-sm font-semibold">
-              ⭐ Premium Member
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 mt-6">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4 text-center">
+              <div className="text-lg sm:text-xl font-bold text-white">{favorites.length}</div>
+              <div className="text-xs text-gray-400">Favorites</div>
             </div>
-          )}
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4 text-center">
+              <div className="text-lg sm:text-xl font-bold text-white">{recentGames.length}</div>
+              <div className="text-xs text-gray-400">Played</div>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4 text-center">
+              <div className="text-lg sm:text-xl font-bold text-white">0</div>
+              <div className="text-xs text-gray-400">Reviews</div>
+            </div>
+          </div>
+          <div className="mt-6 flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <Link href="/favorites" className="px-4 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-sm text-gray-300 rounded-lg transition-colors text-center min-h-[44px] flex items-center justify-center">View Favorites</Link>
+            <button onClick={logout} className="px-4 py-2.5 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-sm text-red-400 rounded-lg transition-colors min-h-[44px]">Logout</button>
+          </div>
         </div>
 
-        {/* XP Bar */}
-        <div className="mt-6">
-          <div className="flex justify-between text-xs text-white/40 mb-1">
-            <span>Level {user.level}</span>
-            <span>{user.xp % 100}/100 XP to next level</span>
-          </div>
-          <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-brand-500 to-blue-500 rounded-full transition-all" style={{ width: `${(user.xp % 100)}%` }} />
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex gap-2 mb-6">
-        {(['overview', 'achievements', 'stats'] as const).map(t => (
-          <button key={t} onClick={() => setTab(t)}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold transition capitalize ${tab === t ? 'bg-brand-500 text-white' : 'bg-white/5 text-white/40 hover:text-white'}`}>
-            {t}
+        <div className="flex gap-2 mb-6 overflow-x-auto hide-scrollbar">
+          <button onClick={() => setActiveTab('favorites')} className={`px-4 sm:px-6 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap min-h-[44px] ${activeTab === 'favorites' ? 'bg-purple-600 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}>
+            Favorites ({favorites.length})
           </button>
-        ))}
+          <button onClick={() => setActiveTab('recent')} className={`px-4 sm:px-6 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap min-h-[44px] ${activeTab === 'recent' ? 'bg-purple-600 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}>
+            Recently Played ({recentGames.length})
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+            {Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton aspect-[3/4] rounded-xl" />)}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+            {(activeTab === 'favorites' ? favorites : recentGames).map((game) => (
+              <Link key={game._id} href={`/game/${game.slug}`} className="group block">
+                <div className="relative rounded-xl overflow-hidden bg-dark-800 border border-white/5 card-glow aspect-[3/4]">
+                  {game.thumbnail ? (
+                    <img src={game.thumbnail} alt={game.name} className="w-full h-full object-cover transition-transform group-hover:scale-110" loading="lazy" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${game.color || '#7c3aed'}, ${game.color || '#3B82F6'}88)` }}>
+                      <span className="text-3xl font-black text-white/80">{game.name?.[0]?.toUpperCase() || '?'}</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <h3 className="text-sm font-bold text-white truncate">{game.name}</h3>
+                    <span className="text-xs text-purple-400">{typeof game.category === 'object' && game.category ? game.category.name : game.categorySlug || ''}</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
-
-      {tab === 'overview' && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: 'Coins', value: user.coins, icon: '🪙', color: 'text-yellow-400' },
-            { label: 'XP', value: user.xp, icon: '⚡', color: 'text-blue-400' },
-            { label: 'Level', value: user.level, icon: '🎮', color: 'text-purple-400' },
-            { label: 'Favorites', value: user.favorites?.length || 0, icon: '❤️', color: 'text-red-400' },
-          ].map(stat => (
-            <div key={stat.label} className="glass rounded-xl p-5 text-center">
-              <div className="text-2xl mb-1">{stat.icon}</div>
-              <div className={`text-2xl font-bold ${stat.color}`}>{formatNumber(stat.value)}</div>
-              <div className="text-xs text-white/40 mt-1">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {tab === 'achievements' && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {(user.achievements || []).map(a => (
-            <div key={a.id} className="glass rounded-xl p-5 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-brand-500/20 flex items-center justify-center text-2xl">{a.icon}</div>
-              <div>
-                <div className="font-semibold">{a.name}</div>
-                <div className="text-xs text-white/40">{a.description}</div>
-              </div>
-            </div>
-          ))}
-          {(!user.achievements || user.achievements.length === 0) && (
-            <div className="col-span-full text-center py-12 text-white/40">No achievements yet. Play games to earn them!</div>
-          )}
-        </div>
-      )}
-
-      {tab === 'stats' && (
-        <div className="glass rounded-xl p-6 space-y-4">
-          <div className="flex justify-between py-2 border-b border-white/5"><span className="text-white/40">Username</span><span>{user.username}</span></div>
-          <div className="flex justify-between py-2 border-b border-white/5"><span className="text-white/40">Email</span><span>{user.email}</span></div>
-          <div className="flex justify-between py-2 border-b border-white/5"><span className="text-white/40">Role</span><span className="capitalize">{user.role}</span></div>
-          <div className="flex justify-between py-2 border-b border-white/5"><span className="text-white/40">Premium</span><span>{user.premium?.isActive ? 'Active' : 'Free'}</span></div>
-          <div className="flex justify-between py-2"><span className="text-white/40">Member Since</span><span>2026</span></div>
-        </div>
-      )}
     </div>
   );
 }

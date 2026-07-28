@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const MONGODB_URI = 'mongodb+srv://bL82aeKN0zoMapyk@onlinegame.fiyq8ez.mongodb.net/?appName=onlinegame';
+const MONGODB_URI = 'mongodb+srv://mohitkushwaha70896_db_user:jqMlCBwZFpplzppN@onlinegame.sciaqzx.mongodb.net/?appName=onlinegame';
 
 const CategorySchema = new mongoose.Schema({
   name: String, slug: String, description: String, color: String, sortOrder: Number, isActive: Boolean, gameCount: Number, totalPlays: Number
@@ -152,17 +152,20 @@ async function seed() {
     ]))[0]?.total || 0 });
   }
 
-  await User.create({
-    username: 'admin', email: 'admin@onlinegame.com', password: 'admin123',
-    role: 'superadmin', displayName: 'Admin', coins: 10000, xp: 5000, level: 50,
-    premium: { isActive: true, expiresAt: new Date('2030-12-31'), plan: 'lifetime' },
-    achievements: [
-      { id: 'first-login', name: 'First Login', description: 'Welcome to Online Game Premium!', icon: '🎮', unlockedAt: new Date() },
-      { id: 'admin', name: 'Administrator', description: 'You have admin powers', icon: '👑', unlockedAt: new Date() },
-    ],
-  });
+  const existingAdmin = await User.findOne({ email: 'admin@onlinegame.com' });
+  if (!existingAdmin) {
+    await User.create({
+      username: 'admin', email: 'admin@onlinegame.com', password: 'mohit@12100890628',
+      role: 'superadmin', displayName: 'Admin', coins: 10000, xp: 5000, level: 50,
+      premium: { isActive: true, expiresAt: new Date('2030-12-31'), plan: 'lifetime' },
+      achievements: [
+        { id: 'first-login', name: 'First Login', description: 'Welcome to Online Game Premium!', icon: '🎮', unlockedAt: new Date() },
+        { id: 'admin', name: 'Administrator', description: 'You have admin powers', icon: '👑', unlockedAt: new Date() },
+      ],
+    });
+  }
 
-  console.log(`Seeded: ${createdCats.length} categories, ${g.length} games, 1 admin user`);
+  console.log(`Seeded: ${createdCats.length} categories, ${g.length} games`);
   await mongoose.disconnect();
 }
 

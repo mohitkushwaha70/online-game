@@ -1,174 +1,288 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { UserAvatar } from '@/lib/utils';
 
-const CATEGORIES = [
-  { name: 'Action', slug: 'action' }, { name: 'Adventure', slug: 'adventure' },
-  { name: 'Racing', slug: 'driving' }, { name: 'Shooting', slug: 'shooting' },
-  { name: 'Puzzle', slug: 'puzzle' }, { name: 'Sports', slug: 'sports' },
-  { name: 'Multiplayer', slug: 'io' }, { name: 'Arcade', slug: 'arcade' },
-  { name: 'Strategy', slug: 'strategy' }, { name: 'Simulation', slug: 'simulation' },
+const categories = [
+  { name: 'Action', slug: 'action' },
+  { name: 'Adventure', slug: 'adventure' },
+  { name: 'Racing', slug: 'racing' },
+  { name: 'Puzzle', slug: 'puzzle' },
+  { name: 'Shooting', slug: 'shooting' },
+  { name: 'Sports', slug: 'sports' },
 ];
 
 export default function Header() {
   const { user, logout } = useAuth();
-  const [search, setSearch] = useState('');
-  const [results, setResults] = useState<any[]>([]);
-  const [showSearch, setShowSearch] = useState(false);
-  const [showUser, setShowUser] = useState(false);
-  const [showMobile, setShowMobile] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    const h = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', h);
-    return () => window.removeEventListener('scroll', h);
-  }, []);
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
 
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) setShowSearch(false);
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
-
-  useEffect(() => {
-    if (!search.trim()) { setResults([]); return; }
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(async () => {
-      const res = await fetch(`/api/games?search=${encodeURIComponent(search)}&limit=8`);
-      const data = await res.json();
-      setResults(data.games || []);
-    }, 300);
-  }, [search]);
+  const handleSearch = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      window.location.href = `/?search=${encodeURIComponent(searchQuery.trim())}`;
+      setSearchOpen(false);
+      setSearchQuery('');
+    }
+  }, [searchQuery]);
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'glass-strong shadow-lg shadow-black/20' : 'bg-dark-950/80 backdrop-blur-sm'}`}>
-      <div className="max-w-[1440px] mx-auto px-4 h-16 flex items-center gap-4">
-        {/* Mobile menu */}
-        <button onClick={() => setShowMobile(!showMobile)} className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    <header className="fixed top-0 left-0 right-0 z-50 h-12 sm:h-14 lg:h-16 bg-dark-950/90 backdrop-blur-xl border-b border-white/5">
+      <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
+        {/* Mobile: Hamburger left */}
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="lg:hidden p-2 min-touch flex items-center justify-center"
+          aria-label="Open menu"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
         </button>
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-blue-500 flex items-center justify-center">
-            <span className="font-gaming text-white text-sm font-bold">OG</span>
+        <Link href="/" className="flex items-center gap-2 min-touch">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21.58 16.09l-1.09-7.66C20.21 6.46 18.52 5 16.53 5H7.47C5.48 5 3.79 6.46 3.51 8.43l-1.09 7.66C2.2 17.63 3.39 19 4.94 19c.68 0 1.32-.34 1.68-.92L8 15h8l1.38 3.08c.36.58 1 .92 1.68.92 1.55 0 2.74-1.37 2.52-2.91zM9 10H7V8h2v2zm5 0h-2V8h2v2z" />
+            </svg>
           </div>
-          <span className="font-heading font-bold text-lg hidden sm:block">
-            <span className="text-gradient">Online Game</span>
-            <span className="text-white/60 ml-1">Premium</span>
-          </span>
+          <span className="hidden sm:block text-lg font-bold tracking-wider text-gradient">ONLINE GAME</span>
         </Link>
 
-        {/* Categories */}
-        <nav className="hidden lg:flex items-center gap-1 ml-4">
-          {CATEGORIES.slice(0, 7).map(c => (
-            <Link key={c.slug} href={`/category/${c.slug}`}
-              className="px-3 py-1.5 text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition">
-              {c.name}
+        {/* Desktop nav */}
+        <nav className="hidden lg:flex items-center gap-1">
+          <Link href="/" className="px-3 py-2 text-sm font-medium text-blue-400 hover:text-blue-300 rounded-lg transition-colors">
+            Home
+          </Link>
+          {categories.map((cat) => (
+            <Link
+              key={cat.slug}
+              href={`/category/${cat.slug}`}
+              className="px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+            >
+              {cat.name}
             </Link>
           ))}
-          <Link href="/category/all" className="px-3 py-1.5 text-sm font-medium text-brand-400 hover:text-brand-300 transition">More</Link>
         </nav>
 
-        {/* Search */}
-        <div ref={searchRef} className="relative flex-1 max-w-md ml-auto">
-          <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-            <input type="text" value={search} onChange={e => { setSearch(e.target.value); setShowSearch(true); }}
-              onFocus={() => setShowSearch(true)}
-              placeholder="Search games... ⌘K"
-              className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-white/30 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition" />
-          </div>
-          {showSearch && results.length > 0 && (
-            <div className="absolute top-full mt-2 w-full glass rounded-xl overflow-hidden shadow-xl animate-slide-down">
-              {results.map(g => (
-                <Link key={g._id} href={`/game/${g.slug}`} onClick={() => { setShowSearch(false); setSearch(''); }}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition">
-                  <div className="w-10 h-7 rounded bg-brand-500/20 flex items-center justify-center text-xs font-bold text-brand-300">
-                    {g.name.slice(0, 2).toUpperCase()}
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium">{g.name}</div>
-                    <div className="text-xs text-white/40">{g.category?.name}</div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Desktop search */}
+        <form onSubmit={handleSearch} className="hidden lg:flex items-center gap-2 flex-1 max-w-xs mx-4">
+          <input
+            type="text"
+            placeholder="Search games..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+          />
+          <button type="submit" className="p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Search">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+        </form>
 
-        {/* User */}
-        <div className="relative">
+        {/* Right side: search icon (mobile) + login/user */}
+        <div className="flex items-center gap-1">
+          {/* Mobile search icon */}
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="lg:hidden p-2 min-touch flex items-center justify-center"
+            aria-label="Search"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+
+          {/* Desktop login */}
           {user ? (
-            <>
-              <button onClick={() => setShowUser(!showUser)}
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-white/5 rounded-xl transition">
-                <UserAvatar name={user.displayName || user.username} src={user.avatar} size={28} />
-                <span className="text-sm font-medium hidden sm:block">{user.displayName || user.username}</span>
-              </button>
-              {showUser && (
-                <div className="absolute right-0 top-full mt-2 w-56 glass rounded-xl overflow-hidden shadow-xl animate-scale-in">
-                  <div className="p-4 border-b border-white/10">
-                    <div className="font-medium">{user.displayName || user.username}</div>
-                    <div className="text-xs text-white/40 mt-0.5">{user.email}</div>
-                    <div className="flex gap-3 mt-2 text-xs">
-                      <span className="text-yellow-400">🪙 {user.coins}</span>
-                      <span className="text-blue-400">⚡ {user.xp} XP</span>
-                      <span className="text-purple-400">Lv.{user.level}</span>
-                    </div>
-                  </div>
-                  <Link href="/profile" className="flex items-center gap-2 px-4 py-3 text-sm hover:bg-white/5 transition" onClick={() => setShowUser(false)}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    Profile
-                  </Link>
-                  <Link href="/favorites" className="flex items-center gap-2 px-4 py-3 text-sm hover:bg-white/5 transition" onClick={() => setShowUser(false)}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-                    Favorites
-                  </Link>
-                  <Link href="/recently-played" className="flex items-center gap-2 px-4 py-3 text-sm hover:bg-white/5 transition" onClick={() => setShowUser(false)}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                    Recently Played
-                  </Link>
-                  {['admin', 'superadmin'].includes(user.role) && (
-                    <Link href="/admin" className="flex items-center gap-2 px-4 py-3 text-sm text-brand-400 hover:bg-white/5 transition" onClick={() => setShowUser(false)}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-                      Admin Panel
-                    </Link>
-                  )}
-                  <button onClick={() => { logout(); setShowUser(false); }}
-                    className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-400 hover:bg-white/5 transition border-t border-white/10">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-                    Logout
-                  </button>
-                </div>
+            <div className="hidden lg:flex items-center gap-2">
+              {(user.role === 'admin' || user.role === 'superadmin') && (
+                <Link
+                  href="/admin"
+                  className="px-3 py-1.5 text-sm font-medium text-purple-400 hover:text-purple-300 bg-purple-500/10 border border-purple-500/20 rounded-lg transition-colors"
+                >
+                  Admin
+                </Link>
               )}
-            </>
+              <Link href="/profile" className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-xs font-bold text-white">
+                  {user.username?.[0]?.toUpperCase() || 'U'}
+                </div>
+                <span className="max-w-[100px] truncate">{user.username}</span>
+              </Link>
+            </div>
           ) : (
-            <Link href="/login" className="px-4 py-2 bg-gradient-to-r from-brand-500 to-blue-500 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-brand-500/25 transition-all">
+            <Link
+              href="/login"
+              className="hidden lg:block px-4 py-1.5 text-sm font-semibold bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-lg transition-all"
+            >
               Login
             </Link>
           )}
         </div>
       </div>
 
-      {/* Mobile nav */}
-      {showMobile && (
-        <div className="lg:hidden glass-strong border-t border-white/10 animate-slide-down">
-          <div className="p-4 grid grid-cols-2 gap-2">
-            {CATEGORIES.map(c => (
-              <Link key={c.slug} href={`/category/${c.slug}`} onClick={() => setShowMobile(false)}
-                className="px-3 py-2 text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition text-center">
-                {c.name}
-              </Link>
-            ))}
+      {/* Mobile nav drawer overlay */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 animate-fade-overlay"
+            onClick={() => setMobileOpen(false)}
+          />
+          {/* Drawer */}
+          <div className="absolute left-0 top-0 bottom-0 w-72 bg-dark-900 border-r border-white/10 animate-drawer-in overflow-y-auto">
+            <div className="p-4 space-y-4">
+              {/* Drawer header */}
+              <div className="flex items-center justify-between">
+                <span className="text-lg font-bold tracking-wider text-gradient">ONLINE GAME</span>
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="p-2 min-touch flex items-center justify-center hover:bg-white/10 rounded-lg"
+                  aria-label="Close menu"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Drawer search */}
+              <form onSubmit={handleSearch} className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Search games..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
+                />
+                <button type="submit" className="p-2.5 hover:bg-white/10 rounded-lg" aria-label="Search">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
+              </form>
+
+              {/* Drawer nav links */}
+              <nav className="space-y-1">
+                <Link
+                  href="/"
+                  onClick={() => setMobileOpen(false)}
+                  className="block px-3 py-2.5 text-sm font-medium text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors min-h-[44px] flex items-center"
+                >
+                  Home
+                </Link>
+                {categories.map((cat) => (
+                  <Link
+                    key={cat.slug}
+                    href={`/category/${cat.slug}`}
+                    onClick={() => setMobileOpen(false)}
+                    className="block px-3 py-2.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors min-h-[44px] flex items-center"
+                  >
+                    {cat.name}
+                  </Link>
+                ))}
+              </nav>
+
+              <div className="border-t border-white/10 pt-4">
+                {user ? (
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-3 px-3 py-2.5">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-sm font-bold text-white">
+                        {user.username?.[0]?.toUpperCase() || 'U'}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-white">{user.username}</p>
+                        <p className="text-xs text-gray-400">{user.email}</p>
+                      </div>
+                    </div>
+                    {(user.role === 'admin' || user.role === 'superadmin') && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setMobileOpen(false)}
+                        className="block px-3 py-2.5 text-sm font-medium text-purple-400 hover:bg-purple-500/10 rounded-lg transition-colors min-h-[44px] flex items-center"
+                      >
+                        Admin Panel
+                      </Link>
+                    )}
+                    <Link
+                      href="/profile"
+                      onClick={() => setMobileOpen(false)}
+                      className="block px-3 py-2.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors min-h-[44px] flex items-center"
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href="/favorites"
+                      onClick={() => setMobileOpen(false)}
+                      className="block px-3 py-2.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors min-h-[44px] flex items-center"
+                    >
+                      Favorites
+                    </Link>
+                    <Link
+                      href="/recently-played"
+                      onClick={() => setMobileOpen(false)}
+                      className="block px-3 py-2.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors min-h-[44px] flex items-center"
+                    >
+                      Recently Played
+                    </Link>
+                    <button
+                      onClick={() => { logout(); setMobileOpen(false); }}
+                      className="block w-full text-left px-3 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/10 rounded-lg transition-colors min-h-[44px] flex items-center"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="block text-center py-3 text-sm font-semibold bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-lg transition-all min-h-[44px] flex items-center justify-center"
+                  >
+                    Login / Sign Up
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile search overlay */}
+      {searchOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setSearchOpen(false)} />
+          <div className="absolute top-0 left-0 right-0 bg-dark-900 border-b border-white/10 p-4 animate-slide-down">
+            <form onSubmit={handleSearch} className="flex gap-2">
+              <input
+                autoFocus
+                type="text"
+                placeholder="Search games..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
+              />
+              <button
+                type="button"
+                onClick={() => setSearchOpen(false)}
+                className="px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors min-h-[44px]"
+              >
+                Cancel
+              </button>
+            </form>
           </div>
         </div>
       )}

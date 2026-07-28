@@ -1,78 +1,57 @@
 'use client';
 
 import Link from 'next/link';
-import { GameThumbnail, formatNumber, Badge } from '@/lib/utils';
+import { useState } from 'react';
+import { Game } from '@/lib/types';
 
-interface Game {
-  _id: string;
-  name: string;
-  slug: string;
-  category?: { name: string; slug: string; color: string };
-  totalPlays: number;
-  totalLikes: number;
-  rating: number;
-  labels: string[];
-  isPremium: boolean;
-  color: string;
+interface GameCardProps {
+  game: Game;
 }
 
-export default function GameCard({ game, portrait = false }: { game: Game; portrait?: boolean }) {
-  const c = game.color || game.category?.color || '#6842FF';
+export default function GameCard({ game }: GameCardProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
-  if (portrait) {
-    return (
-      <Link href={`/game/${game.slug}`} className="group block shrink-0 w-[155px]">
-        <div className="relative rounded-2xl overflow-hidden card-glow">
-          <GameThumbnail name={game.name} color={c} width={155} height={232} className="w-full h-[232px] object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-            <div className="bg-brand-500 text-white text-center py-1.5 rounded-lg text-xs font-bold">Play Now</div>
-          </div>
-          {game.labels?.length > 0 && (
-            <div className="absolute top-2 left-2 flex flex-col gap-1">
-              {game.labels.slice(0, 2).map(l => <Badge key={l} type={l} />)}
-            </div>
-          )}
-          {game.isPremium && (
-            <div className="absolute top-2 right-2 bg-yellow-500/90 text-black text-[10px] font-bold px-1.5 py-0.5 rounded">PRO</div>
-          )}
-        </div>
-        <div className="mt-2">
-          <h3 className="text-sm font-semibold truncate group-hover:text-brand-400 transition">{game.name}</h3>
-          <p className="text-xs text-white/40 mt-0.5">{formatNumber(game.totalPlays)} plays</p>
-        </div>
-      </Link>
-    );
-  }
+  const categoryName = typeof game.category === 'object' && game.category ? game.category.name : (game.categorySlug || game.category || '');
+  const hasImage = game.thumbnail && !imgError;
 
   return (
     <Link href={`/game/${game.slug}`} className="group block">
-      <div className="relative rounded-2xl overflow-hidden card-glow bg-dark-900/50">
-        <div className="relative aspect-[16/9]">
-          <GameThumbnail name={game.name} color={c} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-            <div className="flex gap-1.5">
-              {game.labels?.slice(0, 3).map(l => <Badge key={l} type={l} />)}
-            </div>
-            {game.isPremium && (
-              <span className="bg-yellow-500/90 text-black text-[10px] font-bold px-1.5 py-0.5 rounded">PRO</span>
-            )}
+      <div className="relative rounded-xl overflow-hidden bg-dark-800 border border-white/5 card-glow aspect-[3/4]">
+        {hasImage && !imageLoaded && <div className="absolute inset-0 skeleton" />}
+        {hasImage ? (
+          <img
+            src={game.thumbnail}
+            alt={game.name}
+            className={`w-full h-full object-cover transition-all duration-300 group-hover:scale-110 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImgError(true)}
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${game.color || '#7c3aed'}, ${game.color || '#3B82F6'}88)` }}>
+            <span className="text-3xl font-black text-white/80">{game.name?.[0]?.toUpperCase() || '?'}</span>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-3">
+          <h3 className="text-sm font-bold text-white truncate leading-tight">{game.name}</h3>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-[10px] sm:text-xs text-purple-400 font-medium truncate">{categoryName}</span>
+            <span className="text-[10px] sm:text-xs text-gray-400">•</span>
+            <span className="text-[10px] sm:text-xs text-yellow-400 flex items-center gap-0.5">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              {game.rating?.toFixed(1) || '0.0'}
+            </span>
           </div>
         </div>
-        <div className="p-3">
-          <h3 className="text-sm font-semibold truncate group-hover:text-brand-400 transition">{game.name}</h3>
-          <div className="flex items-center justify-between mt-1.5">
-            <span className="text-xs text-white/40">{game.category?.name}</span>
-            <div className="flex items-center gap-3 text-xs text-white/40">
-              <span className="flex items-center gap-1">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                {game.rating || 0}
-              </span>
-              <span>{formatNumber(game.totalPlays)}</span>
-            </div>
+        {game.isFeatured && (
+          <div className="absolute top-2 left-2 px-2 py-0.5 bg-purple-500 text-white text-[10px] font-bold rounded-full">
+            HOT
           </div>
-        </div>
+        )}
       </div>
     </Link>
   );

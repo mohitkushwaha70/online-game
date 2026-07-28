@@ -1,86 +1,183 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth-context';
 import Link from 'next/link';
+import { useAuth } from '@/lib/auth-context';
+
+declare global {
+  interface Window {
+    google?: any;
+  }
+}
 
 export default function LoginPage() {
-  const { login, register } = useAuth();
-  const router = useRouter();
-  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { login, register, googleLogin } = useAuth();
+  const router = useRouter();
+  const googleBtnRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const loadGoogleScript = () => {
+      if (document.getElementById('google-identity')) return;
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.id = 'google-identity';
+      script.async = true;
+      script.defer = true;
+      script.onload = initGoogleSignIn;
+      document.head.appendChild(script);
+    };
+
+    const initGoogleSignIn = () => {
+      if (!window.google?.accounts?.id || !googleBtnRef.current) return;
+      window.google.accounts.id.initialize({
+        client_id: '616189253887-ibf7vdg4su6qun0e5qk5927k9la2ofv7.apps.googleusercontent.com',
+        callback: handleGoogleCredential,
+        auto_select: false,
+      });
+      window.google.accounts.id.renderButton(googleBtnRef.current, {
+        type: 'standard',
+        size: 'large',
+        theme: 'outline',
+        text: 'continue_with',
+        shape: 'rectangular',
+        width: '100%',
+      });
+    };
+
+    loadGoogleScript();
+    if (window.google?.accounts?.id) initGoogleSignIn();
+  }, []);
+
+  const handleGoogleCredential = async (response: any) => {
+    setError('');
+    setLoading(true);
+    try {
+      await googleLogin(response.credential);
+      router.push('/');
+    } catch (err: any) {
+      setError(err.message || 'Google login failed');
+    }
+    setLoading(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      if (mode === 'login') await login(email, password);
-      else await register(username, email, password);
+      if (isLogin) {
+        await login(email, password);
+      } else {
+        await register(email, password, username);
+      }
       router.push('/');
-    } catch (err: any) { setError(err.message); }
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
+    }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <div className="glass-strong rounded-2xl w-full max-w-md p-8 animate-fade-in">
+    <div className="min-h-screen flex items-center justify-center bg-dark-950 px-4 py-8">
+      <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500 to-blue-500 flex items-center justify-center mx-auto mb-4 shadow-glow">
-            <span className="font-gaming text-white text-2xl font-bold">OG</span>
-          </div>
-          <h1 className="font-heading text-3xl font-bold">{mode === 'login' ? 'Welcome Back' : 'Join Online Game'}</h1>
-          <p className="text-white/40 mt-1">{mode === 'login' ? 'Sign in to your account' : 'Create your free account'}</p>
+          <Link href="/" className="inline-flex items-center gap-2 mb-4">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 flex items-center justify-center">
+              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M21.58 16.09l-1.09-7.66C20.21 6.46 18.52 5 16.53 5H7.47C5.48 5 3.79 6.46 3.51 8.43l-1.09 7.66C2.2 17.63 3.39 19 4.94 19c.68 0 1.32-.34 1.68-.92L8 15h8l1.38 3.08c.36.58 1 .92 1.68.92 1.55 0 2.74-1.37 2.52-2.91zM9 10H7V8h2v2zm5 0h-2V8h2v2z" />
+              </svg>
+            </div>
+            <span className="text-xl font-bold tracking-wider text-gradient">ONLINE GAME</span>
+          </Link>
+          <h1 className="text-2xl font-bold text-white">{isLogin ? 'Welcome Back' : 'Create Account'}</h1>
         </div>
 
-        <div className="flex gap-2 mb-6">
-          <button onClick={() => setMode('login')} className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition ${mode === 'login' ? 'bg-brand-500 text-white' : 'bg-white/5 text-white/40 hover:text-white'}`}>
-            Login
-          </button>
-          <button onClick={() => setMode('register')} className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition ${mode === 'register' ? 'bg-brand-500 text-white' : 'bg-white/5 text-white/40 hover:text-white'}`}>
-            Sign Up
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === 'register' && (
-            <input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-brand-500 transition" />
+        {/* Google Sign-In */}
+        <div className="mb-6">
+          <div ref={googleBtnRef} className="w-full flex justify-center" />
+          {loading && (
+            <div className="flex items-center justify-center gap-2 mt-3 text-sm text-gray-400">
+              <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+              Signing in...
+            </div>
           )}
-          <input type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} required
-            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-brand-500 transition" />
-          <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required
-            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-brand-500 transition" />
-
-          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
-
-          <button type="submit" disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-brand-500 to-blue-500 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-brand-500/25 transition-all disabled:opacity-50">
-            {loading ? 'Please wait...' : mode === 'login' ? 'Login' : 'Create Account'}
-          </button>
-        </form>
-
-        <div className="mt-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-xs text-white/30">or continue with</span>
-            <div className="flex-1 h-px bg-white/10" />
-          </div>
-          <button onClick={() => { login('admin@onlinegame.com', 'admin123').then(() => router.push('/')); }}
-            className="w-full py-3 bg-white/5 border border-white/10 text-white font-medium rounded-xl hover:bg-white/10 transition flex items-center justify-center gap-3">
-            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            Google Sign-In
-          </button>
         </div>
 
-        <p className="text-center text-xs text-white/30 mt-6">
-          <Link href="/" className="text-brand-400 hover:text-brand-300">← Back to Games</Link>
-        </p>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="flex-1 h-px bg-white/10" />
+          <span className="text-xs text-gray-500">or continue with email</span>
+          <div className="flex-1 h-px bg-white/10" />
+        </div>
+
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {!isLogin && (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1.5">Username</label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
+                  placeholder="Enter username"
+                  required={!isLogin}
+                />
+              </div>
+            )}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
+                placeholder="Enter email"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
+                placeholder="Enter password"
+                required
+              />
+            </div>
+            {error && <p className="text-sm text-red-400">{error}</p>}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:opacity-50 text-white font-bold rounded-lg transition-all text-sm min-h-[44px]"
+            >
+              {loading ? 'Please wait...' : isLogin ? 'Login' : 'Register'}
+            </button>
+          </form>
+
+          <div className="mt-4 text-center">
+            <button
+              onClick={() => { setIsLogin(!isLogin); setError(''); }}
+              className="text-sm text-purple-400 hover:text-purple-300"
+            >
+              {isLogin ? "Don't have an account? Register" : 'Already have an account? Login'}
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-6 text-center">
+          <Link href="/admin/login" className="text-xs text-gray-500 hover:text-gray-400">
+            Admin Login →
+          </Link>
+        </div>
       </div>
     </div>
   );

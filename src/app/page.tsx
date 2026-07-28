@@ -2,171 +2,288 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import GameCarousel from '@/components/game/GameCarousel';
 import GameCard from '@/components/game/GameCard';
-import { GameThumbnail, formatNumber } from '@/lib/utils';
+import GameCarousel from '@/components/game/GameCarousel';
+import { Game } from '@/lib/types';
 
-interface Game {
-  _id: string; name: string; slug: string; category?: { name: string; slug: string; color: string };
-  totalPlays: number; totalLikes: number; rating: number; labels: string[]; isPremium: boolean; color: string;
-}
-
-interface Category {
-  _id: string; name: string; slug: string; color: string; gameCount: number;
-}
-
-const CATEGORY_ICONS: Record<string, string> = {
-  action: '⚔️', adventure: '🗺️', arcade: '👾', board: '🎲', card: '🃏', clicker: '👆',
-  driving: '🏎️', io: '🌐', puzzle: '🧩', shooting: '🎯', simulation: '🛩️',
-  sports: '⚽', strategy: '♟️', thinky: '🧠', trivia: '❓', word: '📝',
-};
+const categories = [
+  { name: 'All', slug: 'all' },
+  { name: 'Action', slug: 'action' },
+  { name: 'Adventure', slug: 'adventure' },
+  { name: 'Racing', slug: 'racing' },
+  { name: 'Puzzle', slug: 'puzzle' },
+  { name: 'Shooting', slug: 'shooting' },
+  { name: 'Sports', slug: 'sports' },
+];
 
 export default function HomePage() {
-  const [featured, setFeatured] = useState<Game[]>([]);
-  const [originals, setOriginals] = useState<Game[]>([]);
-  const [trending, setTrending] = useState<Game[]>([]);
-  const [allGames, setAllGames] = useState<Game[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCat, setSelectedCat] = useState('');
-  const [sortBy, setSortBy] = useState('-totalPlays');
+  const [games, setGames] = useState<Game[]>([]);
+  const [featuredGames, setFeaturedGames] = useState<Game[]>([]);
+  const [newGames, setNewGames] = useState<Game[]>([]);
+  const [popularGames, setPopularGames] = useState<Game[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const observerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/games/featured').then(r => r.json()),
-      fetch('/api/games/originals').then(r => r.json()),
-      fetch('/api/games/trending').then(r => r.json()),
-      fetch('/api/categories').then(r => r.json()),
-    ]).then(([f, o, t, c]) => {
-      setFeatured(f.games || []);
-      setOriginals(o.games || []);
-      setTrending(t.games || []);
-      setCategories(c.categories || []);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('search')) {
+      setSearchQuery(params.get('search') || '');
+    }
   }, []);
 
-  const loadGames = useCallback(async (p: number, reset = false) => {
-    let url = `/api/games?page=${p}&limit=20&sort=${sortBy}`;
-    if (selectedCat) url += `&category=${selectedCat}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (reset) setAllGames(data.games || []);
-    else setAllGames(prev => [...prev, ...(data.games || [])]);
-    setHasMore(p < data.pages);
-  }, [sortBy, selectedCat]);
+  const fetchGames = useCallback(async (pageNum: number, category: string, sort: string, search: string, append = false) => {
+    try {
+      const sortParam = sort === 'newest' ? '-createdAt' : sort === 'popular' ? '-totalPlays' : sort === 'rating' ? '-rating' : sort === 'name' ? 'name' : '-createdAt';
+      const params = new URLSearchParams({
+        page: pageNum.toString(),
+        limit: '20',
+        sort: sortParam,
+      });
+      if (category !== 'all') params.set('category', category);
+      if (search) params.set('search', search);
 
-  useEffect(() => { setPage(1); loadGames(1, true); }, [loadGames]);
+      const res = await fetch(`/api/games?${params.toString()}`);
+      const data = await res.json();
+
+      if (append) {
+        setGames(prev => [...prev, ...data.games]);
+      } else {
+        setGames(data.games);
+      }
+      setHasMore(data.page < data.pages);
+    } catch (error) {
+      console.error('Failed to fetch games:', error);
+    }
+  }, []);
 
   useEffect(() => {
-    const obs = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore && !loading) {
-        setPage(p => { const np = p + 1; loadGames(np); return np; });
+    const fetchSections = async () => {
+      setLoading(true);
+      try {
+        const [featuredRes, newRes, popularRes] = await Promise.all([
+          fetch('/api/games?isFeatured=true&limit=10'),
+          fetch('/api/games?sort=-createdAt&limit=10'),
+          fetch('/api/games?sort=-totalPlays&limit=10'),
+        ]);
+        const [featuredData, newData, popularData] = await Promise.all([
+          featuredRes.json(),
+          newRes.json(),
+          popularRes.json(),
+        ]);
+        setFeaturedGames(featuredData.games || []);
+        setNewGames(newData.games || []);
+        setPopularGames(popularData.games || []);
+      } catch (error) {
+        console.error('Failed to fetch sections:', error);
       }
-    }, { threshold: 0.1 });
-    if (loadMoreRef.current) obs.observe(loadMoreRef.current);
-    return () => obs.disconnect();
-  }, [hasMore, loading, loadGames]);
+      setLoading(false);
+    };
+    fetchSections();
+  }, []);
 
-  const heroGame = featured[0];
+  useEffect(() => {
+    setPage(1);
+    setHasMore(true);
+    fetchGames(1, selectedCategory, sortBy, searchQuery);
+  }, [selectedCategory, sortBy, searchQuery, fetchGames]);
+
+  useEffect(() => {
+    if (page > 1) {
+      fetchGames(page, selectedCategory, sortBy, searchQuery, true);
+    }
+  }, [page, selectedCategory, sortBy, searchQuery, fetchGames]);
+
+  useEffect(() => {
+    if (loading || !hasMore) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          setLoadingMore(true);
+          setPage(prev => prev + 1);
+          setTimeout(() => setLoadingMore(false), 500);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (observerRef.current) observer.observe(observerRef.current);
+    return () => observer.disconnect();
+  }, [loading, hasMore, loadingMore]);
+
+  const showCarousels = !searchQuery && selectedCategory === 'all';
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4">
-      {/* Hero Banner */}
-      {heroGame && (
-        <section className="relative rounded-3xl overflow-hidden mb-10 mt-4 h-[300px] md:h-[400px]">
-          <div className="absolute inset-0">
-            <GameThumbnail name={heroGame.name} color={heroGame.color || heroGame.category?.color} width={1440} height={400} className="w-full h-full object-cover" />
+    <div className="min-h-screen bg-dark-950">
+      {/* Premium Hero Banner */}
+      <section className="relative overflow-hidden min-h-[420px] sm:min-h-[480px] lg:min-h-[540px] flex items-center">
+        {/* Animated background */}
+        <div className="absolute inset-0 bg-dark-950">
+          {/* Grid pattern */}
+          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+          {/* Big purple glow */}
+          <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '4s' }} />
+          {/* Big blue glow */}
+          <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
+          {/* Center glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-purple-500/10 rounded-full blur-[100px]" />
+          {/* Floating particles */}
+          <div className="absolute top-20 left-[10%] w-2 h-2 bg-purple-400/40 rounded-full animate-bounce" style={{ animationDuration: '3s' }} />
+          <div className="absolute top-40 right-[15%] w-1.5 h-1.5 bg-blue-400/40 rounded-full animate-bounce" style={{ animationDuration: '4s', animationDelay: '0.5s' }} />
+          <div className="absolute bottom-32 left-[20%] w-1 h-1 bg-purple-300/30 rounded-full animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '1s' }} />
+          <div className="absolute top-32 right-[30%] w-1 h-1 bg-blue-300/30 rounded-full animate-bounce" style={{ animationDuration: '2.5s', animationDelay: '1.5s' }} />
+          {/* Neon line accents */}
+          <div className="absolute top-1/3 left-0 w-40 h-px bg-gradient-to-r from-transparent via-purple-500/40 to-transparent" />
+          <div className="absolute bottom-1/3 right-0 w-40 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
+          {/* Game icons floating */}
+          <div className="absolute top-16 right-[8%] text-4xl opacity-10 rotate-12 select-none hidden lg:block">🎮</div>
+          <div className="absolute bottom-20 left-[8%] text-4xl opacity-10 -rotate-12 select-none hidden lg:block">🕹️</div>
+          <div className="absolute top-1/2 right-[5%] text-3xl opacity-10 rotate-45 select-none hidden lg:block">🏆</div>
+        </div>
+
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-dark-950 to-transparent" />
+
+        {/* Content */}
+        <div className="relative max-w-7xl mx-auto px-4 py-16 sm:py-20 lg:py-24 text-center w-full">
+          <div className="inline-flex items-center gap-2 mb-6 px-5 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full shadow-lg shadow-purple-500/5">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+            </span>
+            <span className="text-xs sm:text-sm font-medium text-gray-300">Play instantly — No download required</span>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-r from-dark-950 via-dark-950/70 to-transparent" />
-          <div className="absolute inset-0 flex items-center">
-            <div className="p-8 md:p-12 max-w-lg">
-              <div className="flex gap-2 mb-3">
-                {heroGame.labels?.map(l => (
-                  <span key={l} className="text-xs font-bold px-2 py-1 rounded-lg bg-white/10 backdrop-blur-sm">
-                    {l === 'hot' ? '🔥 Trending' : l === 'new' ? '✨ New' : l === 'top' ? '⭐ Top Rated' : l}
-                  </span>
-                ))}
-              </div>
-              <h1 className="font-heading text-3xl md:text-5xl font-bold mb-3">{heroGame.name}</h1>
-              <p className="text-white/60 text-sm md:text-base mb-6 line-clamp-2">
-                {heroGame.category?.name} • {formatNumber(heroGame.totalPlays)} plays • Rated {heroGame.rating}/5
-              </p>
-              <Link href={`/game/${heroGame.slug}`}
-                className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-brand-500 to-blue-500 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-brand-500/25 transition-all text-lg">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Play Now
-              </Link>
+          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-6 leading-[1.1]">
+            Play <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 bg-clip-text text-transparent bg-[length:200%_auto] animate-[shimmer_3s_linear_infinite]">Premium Games</span>
+            <br className="hidden sm:block" />
+            <span className="text-white"> for Free</span>
+          </h1>
+          <p className="text-base sm:text-lg text-gray-400 max-w-xl mx-auto mb-10 px-4">
+            100+ handpicked browser games. Action, racing, puzzles — play anything, anywhere, instantly.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4 px-4">
+            <Link href="#games" className="group relative px-8 py-3.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold rounded-xl transition-all text-center min-h-[48px] flex items-center justify-center text-sm sm:text-base shadow-xl shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-105">
+              <span className="relative z-10 flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Start Playing
+              </span>
+            </Link>
+            <Link href="/category/action" className="group px-8 py-3.5 bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 text-white font-bold rounded-xl transition-all text-center min-h-[48px] flex items-center justify-center text-sm sm:text-base hover:scale-105">
+              <span className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 24 24"><path d="M21.58 16.09l-1.09-7.66C20.21 6.46 18.52 5 16.53 5H7.47C5.48 5 3.79 6.46 3.51 8.43l-1.09 7.66C2.2 17.63 3.39 19 4.94 19c.68 0 1.32-.34 1.68-.92L8 15h8l1.38 3.08c.36.58 1 .92 1.68.92 1.55 0 2.74-1.37 2.52-2.91zM9 10H7V8h2v2zm5 0h-2V8h2v2z" /></svg>
+                Action Games
+              </span>
+            </Link>
+          </div>
+          {/* Stats bar */}
+          <div className="flex items-center justify-center gap-6 sm:gap-10 mt-12 text-center">
+            <div>
+              <div className="text-xl sm:text-2xl font-black text-white">55+</div>
+              <div className="text-[11px] sm:text-xs text-gray-500 uppercase tracking-wider">Games</div>
+            </div>
+            <div className="w-px h-8 bg-white/10" />
+            <div>
+              <div className="text-xl sm:text-2xl font-black text-white">16</div>
+              <div className="text-[11px] sm:text-xs text-gray-500 uppercase tracking-wider">Categories</div>
+            </div>
+            <div className="w-px h-8 bg-white/10" />
+            <div>
+              <div className="text-xl sm:text-2xl font-black text-white">Free</div>
+              <div className="text-[11px] sm:text-xs text-gray-500 uppercase tracking-wider">Forever</div>
             </div>
           </div>
-        </section>
-      )}
-
-      {/* Category Grid */}
-      <section className="mb-10">
-        <h2 className="font-heading text-xl font-bold mb-4">Browse Categories</h2>
-        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-16 gap-3">
-          {categories.map(cat => (
-            <Link key={cat._id} href={`/category/${cat.slug}`}
-              className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/3 hover:bg-white/8 border border-white/5 hover:border-white/15 transition-all group">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl"
-                style={{ background: `${cat.color}20` }}>
-                {CATEGORY_ICONS[cat.slug] || '🎮'}
-              </div>
-              <span className="text-xs font-medium text-white/60 group-hover:text-white transition text-center">{cat.name}</span>
-            </Link>
-          ))}
         </div>
       </section>
 
-      {/* Carousels */}
-      <GameCarousel title="🔥 Featured Games" games={featured} viewAllLink="/category/all" />
-      <GameCarousel title="💎 Online Game Originals" games={originals} viewAllLink="/category/all" portrait />
-      <GameCarousel title="📈 Most Played" games={trending} viewAllLink="/category/all" />
+      <div className="max-w-7xl mx-auto px-4 pb-12">
+        {/* Carousels */}
+        {showCarousels && !loading && (
+          <div className="space-y-10 mb-12">
+            {featuredGames.length > 0 && (
+              <GameCarousel title="Featured Games" games={featuredGames} viewAllLink="/?sort=featured" />
+            )}
+            {newGames.length > 0 && (
+              <GameCarousel title="New Games" games={newGames} viewAllLink="/?sort=newest" />
+            )}
+            {popularGames.length > 0 && (
+              <GameCarousel title="Most Popular" games={popularGames} viewAllLink="/?sort=popular" />
+            )}
+          </div>
+        )}
 
-      {/* Infinite Scroll Grid */}
-      <section className="mb-10">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-heading text-xl font-bold">All Games</h2>
-          <div className="flex gap-2">
-            <select value={selectedCat} onChange={e => setSelectedCat(e.target.value)}
-              className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-brand-500">
-              <option value="">All Categories</option>
-              {categories.map(c => <option key={c._id} value={c.slug}>{c.name}</option>)}
-            </select>
-            <select value={sortBy} onChange={e => setSortBy(e.target.value)}
-              className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-brand-500">
-              <option value="-totalPlays">Most Played</option>
-              <option value="-totalLikes">Most Liked</option>
-              <option value="-rating">Highest Rated</option>
-              <option value="-createdAt">Newest</option>
-            </select>
+        {/* Filters */}
+        <div id="games" className="mb-8 scroll-mt-20">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            {/* Category filters - wrap on mobile */}
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat.slug}
+                  onClick={() => setSelectedCategory(cat.slug)}
+                  className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all min-h-[44px] ${
+                    selectedCategory === cat.slug
+                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
+                      : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Sort dropdown - full width on mobile */}
+            <div className="flex flex-col sm:flex-row sm:justify-end gap-2">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full sm:w-auto px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-gray-300 focus:outline-none focus:border-purple-500 min-h-[44px] appearance-none"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '20px' }}
+              >
+                <option value="newest">Newest First</option>
+                <option value="popular">Most Popular</option>
+                <option value="rating">Top Rated</option>
+                <option value="name">A-Z</option>
+              </select>
+            </div>
           </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {allGames.map(g => <GameCard key={g._id} game={g} />)}
-        </div>
-        {allGames.length === 0 && !loading && (
-          <div className="text-center py-20 text-white/40">No games found</div>
-        )}
-        <div ref={loadMoreRef} className="h-10" />
-        {loading && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-4">
+
+        {/* Game grid */}
+        {loading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
             {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="rounded-2xl overflow-hidden">
-                <div className="skeleton aspect-[16/9]" />
-                <div className="p-3 space-y-2">
-                  <div className="skeleton h-4 w-3/4" />
-                  <div className="skeleton h-3 w-1/2" />
-                </div>
-              </div>
+              <div key={i} className="skeleton aspect-[3/4] rounded-xl" />
             ))}
           </div>
+        ) : games.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-gray-400 text-lg">No games found</p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+              {games.map((game) => (
+                <GameCard key={game._id} game={game} />
+              ))}
+            </div>
+
+            {loadingMore && (
+              <div className="flex justify-center py-8">
+                <div className="flex items-center gap-2 text-gray-400">
+                  <div className="w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                  <span>Loading more games...</span>
+                </div>
+              </div>
+            )}
+
+            <div ref={observerRef} className="h-4" />
+          </>
         )}
-      </section>
+      </div>
     </div>
   );
 }

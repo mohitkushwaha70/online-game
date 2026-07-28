@@ -32,6 +32,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       stats: { totalGames, activeGames, totalUsers, totalCategories, todayPlays, totalPlays: tp[0]?.total || 0, totalLikes: tl[0]?.total || 0 },
       topGames, recentPlays, playsByDay, categoryStats,
-    });
+    }, { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } });
   } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 500 }); }
 }

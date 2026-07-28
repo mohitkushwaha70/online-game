@@ -1,81 +1,55 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
   theme: {
     extend: {
+      screens: {
+        xs: '480px',
+      },
       colors: {
-        brand: {
-          50: '#f0e7ff',
-          100: '#d4b5ff',
-          200: '#b07aff',
-          300: '#8c3eff',
-          400: '#7c3aed',
-          500: '#6842FF',
-          600: '#5a36e0',
-          700: '#4c2dbf',
-          800: '#3d2499',
-          900: '#2e1b73',
-        },
         dark: {
           50: '#f0f2f5',
-          100: '#e0e3ea',
-          200: '#c1c7d5',
-          300: '#a2abc0',
-          400: '#8390ab',
-          500: '#6b7590',
-          600: '#525a6d',
-          700: '#3a3f4e',
-          800: '#2a2d3a',
-          900: '#1a1b28',
+          100: '#e1e5eb',
+          200: '#c3cbd7',
+          300: '#a5b1c3',
+          400: '#8797af',
+          500: '#697d9b',
+          600: '#54647c',
+          700: '#3f4b5d',
+          800: '#2a323e',
+          850: '#222831',
+          900: '#1a1f2a',
+          925: '#161b24',
           950: '#0f1019',
         },
-        gaming: {
-          purple: '#8B5CF6',
-          blue: '#3B82F6',
-          cyan: '#06B6D4',
-          pink: '#EC4899',
-          green: '#10B981',
-          orange: '#F59E0B',
-          red: '#EF4444',
+        brand: {
+          DEFAULT: '#7c3aed',
+          light: '#8B5CF6',
+          dark: '#6d28d9',
         },
       },
       fontFamily: {
-        heading: ['Rajdhani', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
-        gaming: ['Orbitron', 'sans-serif'],
-      },
-      backgroundImage: {
-        'gradient-gaming': 'linear-gradient(135deg, #6842FF 0%, #3B82F6 50%, #06B6D4 100%)',
-        'gradient-dark': 'linear-gradient(180deg, #0f1019 0%, #1a1b28 100%)',
-        'gradient-card': 'linear-gradient(145deg, rgba(42,45,58,0.8) 0%, rgba(26,27,40,0.9) 100%)',
-        'gradient-glass': 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Orbitron', 'sans-serif'],
+        body: ['Rajdhani', 'sans-serif'],
       },
       animation: {
-        'glow': 'glow 2s ease-in-out infinite alternate',
-        'float': 'float 3s ease-in-out infinite',
-        'shimmer': 'shimmer 2s linear infinite',
+        'pulse-glow': 'pulse 2s ease-in-out infinite',
         'slide-up': 'slideUp 0.3s ease-out',
-        'slide-down': 'slideDown 0.3s ease-out',
-        'fade-in': 'fadeIn 0.3s ease-out',
-        'scale-in': 'scaleIn 0.2s ease-out',
       },
       keyframes: {
-        glow: { '0%': { boxShadow: '0 0 20px rgba(104,66,255,0.3)' }, '100%': { boxShadow: '0 0 40px rgba(104,66,255,0.6)' } },
-        float: { '0%,100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-10px)' } },
-        shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
-        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
-        slideDown: { '0%': { transform: 'translateY(-20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
-        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-        scaleIn: { '0%': { transform: 'scale(0.9)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } },
-      },
-      boxShadow: {
-        'glass': '0 8px 32px 0 rgba(0,0,0,0.36)',
-        'glow': '0 0 30px rgba(104,66,255,0.4)',
-        'glow-lg': '0 0 60px rgba(104,66,255,0.5)',
-        'card': '0 4px 20px rgba(0,0,0,0.3)',
-        'card-hover': '0 8px 40px rgba(104,66,255,0.3)',
+        slideUp: {
+          '0%': { transform: 'translateY(20px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
       },
     },
   },
   plugins: [],
 };
+export default config;
