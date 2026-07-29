@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const MONGODB_URI = 'mongodb+srv://mohitkushwaha70896_db_user:jqMlCBwZFpplzppN@onlinegame.sciaqzx.mongodb.net/?appName=onlinegame';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const CategorySchema = new mongoose.Schema({
   name: String, slug: String, description: String, color: String, sortOrder: Number, isActive: Boolean, gameCount: Number, totalPlays: Number
@@ -155,7 +155,7 @@ async function seed() {
   const existingAdmin = await User.findOne({ email: 'admin@onlinegame.com' });
   if (!existingAdmin) {
     await User.create({
-      username: 'admin', email: 'admin@onlinegame.com', password: 'mohit@12100890628',
+      username: 'admin', email: 'admin@onlinegame.com', password: process.env.ADMIN_PASSWORD,
       role: 'superadmin', displayName: 'Admin', coins: 10000, xp: 5000, level: 50,
       premium: { isActive: true, expiresAt: new Date('2030-12-31'), plan: 'lifetime' },
       achievements: [

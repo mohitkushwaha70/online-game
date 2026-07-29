@@ -37,7 +37,7 @@ export default function LoginPage() {
     const initGoogleSignIn = () => {
       if (!window.google?.accounts?.id || !googleBtnRef.current) return;
       window.google.accounts.id.initialize({
-        client_id: '616189253887-ibf7vdg4su6qun0e5qk5927k9la2ofv7.apps.googleusercontent.com',
+        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
         callback: handleGoogleCredential,
         auto_select: false,
       });

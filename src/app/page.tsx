@@ -179,21 +179,21 @@ export default function HomePage() {
               </span>
             </Link>
           </div>
-          {/* Stats bar */}
-          <div className="flex items-center justify-center gap-6 sm:gap-10 mt-12 text-center">
+          {/* Stats bar - compact on mobile */}
+          <div className="flex items-center justify-center gap-4 sm:gap-10 mt-10 sm:mt-12 text-center">
             <div>
-              <div className="text-xl sm:text-2xl font-black text-white">55+</div>
-              <div className="text-[11px] sm:text-xs text-gray-500 uppercase tracking-wider">Games</div>
+              <div className="text-base sm:text-2xl font-black text-white">55+</div>
+              <div className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Games</div>
             </div>
-            <div className="w-px h-8 bg-white/10" />
+            <div className="w-px h-6 sm:h-8 bg-white/10" />
             <div>
-              <div className="text-xl sm:text-2xl font-black text-white">16</div>
-              <div className="text-[11px] sm:text-xs text-gray-500 uppercase tracking-wider">Categories</div>
+              <div className="text-base sm:text-2xl font-black text-white">16</div>
+              <div className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Categories</div>
             </div>
-            <div className="w-px h-8 bg-white/10" />
+            <div className="w-px h-6 sm:h-8 bg-white/10" />
             <div>
-              <div className="text-xl sm:text-2xl font-black text-white">Free</div>
-              <div className="text-[11px] sm:text-xs text-gray-500 uppercase tracking-wider">Forever</div>
+              <div className="text-base sm:text-2xl font-black text-white">Free</div>
+              <div className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Forever</div>
             </div>
           </div>
         </div>

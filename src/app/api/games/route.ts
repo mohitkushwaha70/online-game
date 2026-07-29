@@ -8,12 +8,13 @@ export async function GET(req: NextRequest) {
   try {
     await connectDB();
     const { searchParams } = new URL(req.url);
-    let { category, search, label, sort = '-createdAt', page = '1', limit = '20', isPremium, status } = Object.fromEntries(searchParams);
+    let { category, search, label, sort = '-createdAt', page = '1', limit = '20', isPremium, isFeatured, status } = Object.fromEntries(searchParams);
     const p = parseInt(page); const l = parseInt(limit);
     const query: any = {};
     if (status) query.status = status; else query.status = 'active';
     if (category) { const c = await Category.findOne({ slug: category }); if (c) query.category = c._id; }
     if (isPremium === 'true') query.isPremium = true;
+    if (isFeatured === 'true') query.isFeatured = true;
     if (label) query.labels = { $in: [label] };
     if (search) query.$text = { $search: search };
     const games = await Game.find(query).populate('category', 'name slug color').sort(sort).skip((p - 1) * l).limit(l);

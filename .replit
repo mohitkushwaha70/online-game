@@ -1,4 +1,4 @@
-run = "npm run dev"
+run = "npm run build && npm run start"
 entrypoint = "src/app/page.tsx"
 modules = ["nodejs-20"]
 

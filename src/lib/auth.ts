@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 import connectDB from './mongodb';
 import { User, IUser } from './models';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'online-game-premium-secret-2026';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export function signToken(userId: string, role: string): string {
   return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: '7d' });

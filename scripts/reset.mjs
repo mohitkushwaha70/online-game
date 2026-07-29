@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = 'mongodb+srv://bL82aeKN0zoMapyk@onlinegame.fiyq8ez.mongodb.net/?appName=onlinegame';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 async function reset() {
   await mongoose.connect(MONGODB_URI);
