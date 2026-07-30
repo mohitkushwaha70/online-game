@@ -5,9 +5,22 @@
 @tailwind utilities;
 
 :root {
-  --brand: #7c3aed;
-  --brand-light: #8B5CF6;
-  --brand-dark: #6d28d9;
+  --brand-rgb: 124 58 237;
+  --brand-light-rgb: 139 92 246;
+  --brand-dark-rgb: 109 40 217;
+  --brand-50-rgb: 243 232 255;
+  --brand-100-rgb: 233 213 255;
+  --brand-200-rgb: 216 180 254;
+  --brand-300-rgb: 192 132 252;
+  --brand-400-rgb: 168 85 247;
+  --brand-500-rgb: 124 58 237;
+  --brand-600-rgb: 109 40 217;
+  --brand-700-rgb: 91 33 182;
+  --brand-800-rgb: 76 29 149;
+  --brand-900-rgb: 59 7 100;
+  --accent-color: #7c3aed;
+  --accent-from: #7c3aed;
+  --accent-to: #3B82F6;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -37,7 +50,7 @@ img, video, iframe { max-width: 100%; height: auto; }
   .glass-strong { @apply bg-white/10 backdrop-blur-2xl border border-white/15; }
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, #7c3aed, #3B82F6);
+    background-image: linear-gradient(135deg, var(--accent-from), var(--accent-to));
   }
   .card-glow { box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: all 0.3s ease; }
   .card-glow:hover { box-shadow: 0 8px 40px rgba(124,58,237,0.3); transform: translateY(-4px); }

@@ -3,7 +3,8 @@ import { NextRequest } from 'next/server';
 import connectDB from './mongodb';
 import { User, IUser } from './models';
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET!;
+if (!JWT_SECRET) throw new Error('JWT_SECRET environment variable is required');
 
 export function signToken(userId: string, role: string): string {
   return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: '7d' });

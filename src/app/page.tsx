@@ -125,24 +125,24 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-dark-950">
           {/* Grid pattern */}
           <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
-          {/* Big purple glow */}
-          <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '4s' }} />
-          {/* Big blue glow */}
-          <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
+          {/* Big glow */}
+          <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '4s', backgroundColor: 'rgb(var(--brand-500-rgb) / 0.2)' }} />
+          {/* Big glow 2 */}
+          <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s', backgroundColor: 'rgb(var(--brand-500-rgb) / 0.15)' }} />
           {/* Center glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-purple-500/10 rounded-full blur-[100px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full blur-[100px]" style={{ backgroundColor: 'rgb(var(--brand-500-rgb) / 0.1)' }} />
           {/* Floating particles */}
-          <div className="absolute top-20 left-[10%] w-2 h-2 bg-purple-400/40 rounded-full animate-bounce" style={{ animationDuration: '3s' }} />
-          <div className="absolute top-40 right-[15%] w-1.5 h-1.5 bg-blue-400/40 rounded-full animate-bounce" style={{ animationDuration: '4s', animationDelay: '0.5s' }} />
-          <div className="absolute bottom-32 left-[20%] w-1 h-1 bg-purple-300/30 rounded-full animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '1s' }} />
-          <div className="absolute top-32 right-[30%] w-1 h-1 bg-blue-300/30 rounded-full animate-bounce" style={{ animationDuration: '2.5s', animationDelay: '1.5s' }} />
+          <div className="absolute top-20 left-[10%] w-2 h-2 rounded-full animate-bounce" style={{ animationDuration: '3s', backgroundColor: 'rgb(var(--brand-400-rgb) / 0.4)' }} />
+          <div className="absolute top-40 right-[15%] w-1.5 h-1.5 rounded-full animate-bounce" style={{ animationDuration: '4s', animationDelay: '0.5s', backgroundColor: 'rgb(var(--brand-400-rgb) / 0.4)' }} />
+          <div className="absolute bottom-32 left-[20%] w-1 h-1 rounded-full animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '1s', backgroundColor: 'rgb(var(--brand-400-rgb) / 0.3)' }} />
+          <div className="absolute top-32 right-[30%] w-1 h-1 rounded-full animate-bounce" style={{ animationDuration: '2.5s', animationDelay: '1.5s', backgroundColor: 'rgb(var(--brand-400-rgb) / 0.3)' }} />
           {/* Neon line accents */}
-          <div className="absolute top-1/3 left-0 w-40 h-px bg-gradient-to-r from-transparent via-purple-500/40 to-transparent" />
-          <div className="absolute bottom-1/3 right-0 w-40 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
+          <div className="absolute top-1/3 left-0 w-40 h-px bg-gradient-to-r from-transparent via-brand-500/40 to-transparent" />
+          <div className="absolute bottom-1/3 right-0 w-40 h-px bg-gradient-to-r from-transparent via-brand-500/40 to-transparent" />
           {/* Game icons floating */}
           <div className="absolute top-16 right-[8%] text-4xl opacity-10 rotate-12 select-none hidden lg:block">🎮</div>
           <div className="absolute bottom-20 left-[8%] text-4xl opacity-10 -rotate-12 select-none hidden lg:block">🕹️</div>
-          <div className="absolute top-1/2 right-[5%] text-3xl opacity-10 rotate-45 select-none hidden lg:block">🏆</div>
+          <div className="absolute top-1/2 right-[5%] text-4xl opacity-10 rotate-45 select-none hidden lg:block">🏆</div>
         </div>
 
         {/* Bottom fade */}
@@ -150,7 +150,7 @@ export default function HomePage() {
 
         {/* Content */}
         <div className="relative max-w-7xl mx-auto px-4 py-16 sm:py-20 lg:py-24 text-center w-full">
-          <div className="inline-flex items-center gap-2 mb-6 px-5 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full shadow-lg shadow-purple-500/5">
+          <div className="inline-flex items-center gap-2 mb-6 px-5 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full" style={{ boxShadow: '0 10px 15px -3px rgb(var(--brand-500-rgb) / 0.05)' }}>
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
@@ -158,7 +158,7 @@ export default function HomePage() {
             <span className="text-xs sm:text-sm font-medium text-gray-300">Play instantly — No download required</span>
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-6 leading-[1.1]">
-            Play <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 bg-clip-text text-transparent bg-[length:200%_auto] animate-[shimmer_3s_linear_infinite]">Premium Games</span>
+            Play <span className="bg-clip-text text-transparent bg-[length:200%_auto] animate-[shimmer_3s_linear_infinite]" style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--brand-400-rgb)), rgb(var(--brand-500-rgb)), rgb(var(--brand-400-rgb)))' }}>Premium Games</span>
             <br className="hidden sm:block" />
             <span className="text-white"> for Free</span>
           </h1>
@@ -166,7 +166,7 @@ export default function HomePage() {
             100+ handpicked browser games. Action, racing, puzzles — play anything, anywhere, instantly.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 px-4">
-            <Link href="#games" className="group relative px-8 py-3.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold rounded-xl transition-all text-center min-h-[48px] flex items-center justify-center text-sm sm:text-base shadow-xl shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-105">
+            <Link href="#games" className="group relative px-8 py-3.5 text-white font-bold rounded-xl transition-all text-center min-h-[48px] flex items-center justify-center text-sm sm:text-base hover:scale-105" style={{ background: 'linear-gradient(135deg, rgb(var(--brand-500-rgb)), rgb(var(--brand-500-rgb) 0.8))', boxShadow: '0 10px 15px -3px rgb(var(--brand-500-rgb) / 0.25)' }}>
               <span className="relative z-10 flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 Start Playing
@@ -174,7 +174,7 @@ export default function HomePage() {
             </Link>
             <Link href="/category/action" className="group px-8 py-3.5 bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 text-white font-bold rounded-xl transition-all text-center min-h-[48px] flex items-center justify-center text-sm sm:text-base hover:scale-105">
               <span className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 24 24"><path d="M21.58 16.09l-1.09-7.66C20.21 6.46 18.52 5 16.53 5H7.47C5.48 5 3.79 6.46 3.51 8.43l-1.09 7.66C2.2 17.63 3.39 19 4.94 19c.68 0 1.32-.34 1.68-.92L8 15h8l1.38 3.08c.36.58 1 .92 1.68.92 1.55 0 2.74-1.37 2.52-2.91zM9 10H7V8h2v2zm5 0h-2V8h2v2z" /></svg>
+                <svg className="w-5 h-5" fill="currentColor" style={{ color: 'rgb(var(--brand-400-rgb))' }} viewBox="0 0 24 24"><path d="M21.58 16.09l-1.09-7.66C20.21 6.46 18.52 5 16.53 5H7.47C5.48 5 3.79 6.46 3.51 8.43l-1.09 7.66C2.2 17.63 3.39 19 4.94 19c.68 0 1.32-.34 1.68-.92L8 15h8l1.38 3.08c.36.58 1 .92 1.68.92 1.55 0 2.74-1.37 2.52-2.91zM9 10H7V8h2v2zm5 0h-2V8h2v2z" /></svg>
                 Action Games
               </span>
             </Link>
@@ -220,19 +220,29 @@ export default function HomePage() {
           <div className="flex flex-col gap-3 sm:gap-4">
             {/* Category filters - wrap on mobile */}
             <div className="flex flex-wrap gap-2">
-              {categories.map((cat) => (
-                <button
-                  key={cat.slug}
-                  onClick={() => setSelectedCategory(cat.slug)}
-                  className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all min-h-[44px] ${
-                    selectedCategory === cat.slug
-                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
-                      : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              ))}
+              {categories.map((cat) =>
+                cat.slug === 'all' ? (
+                  <button
+                    key={cat.slug}
+                    onClick={() => setSelectedCategory(cat.slug)}
+                    className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all min-h-[44px] ${
+                      selectedCategory === cat.slug
+                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
+                        : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                ) : (
+                  <Link
+                    key={cat.slug}
+                    href={`/category/${cat.slug}`}
+                    className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all min-h-[44px] bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10 inline-flex items-center"
+                  >
+                    {cat.name}
+                  </Link>
+                )
+              )}
             </div>
 
             {/* Sort dropdown - full width on mobile */}

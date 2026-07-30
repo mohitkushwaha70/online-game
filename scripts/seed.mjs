@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) { console.error('MONGODB_URI environment variable is required'); process.exit(1); }
 
 const CategorySchema = new mongoose.Schema({
   name: String, slug: String, description: String, color: String, sortOrder: Number, isActive: Boolean, gameCount: Number, totalPlays: Number

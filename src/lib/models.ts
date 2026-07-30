@@ -203,6 +203,12 @@ const CouponSchema = new Schema({
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 
+// ==================== SITE CONFIG ====================
+const SiteConfigSchema = new Schema({
+  key: { type: String, required: true, unique: true },
+  value: { type: Schema.Types.Mixed, required: true },
+}, { timestamps: true });
+
 // ==================== MODELS ====================
 export const Category: Model<ICategory> = mongoose.models.Category || mongoose.model<ICategory>('Category', CategorySchema);
 export const Game: Model<IGame> = mongoose.models.Game || mongoose.model<IGame>('Game', GameSchema);
@@ -212,3 +218,4 @@ export const Analytics = mongoose.models.Analytics || mongoose.model('Analytics'
 export const Notification = mongoose.models.Notification || mongoose.model('Notification', NotificationSchema);
 export const Banner = mongoose.models.Banner || mongoose.model('Banner', BannerSchema);
 export const Coupon = mongoose.models.Coupon || mongoose.model('Coupon', CouponSchema);
+export const SiteConfig = mongoose.models.SiteConfig || mongoose.model('SiteConfig', SiteConfigSchema);

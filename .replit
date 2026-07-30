@@ -5,6 +5,9 @@ modules = ["nodejs-20"]
 [nix]
 channel = "stable-24_05"
 
+# IMPORTANT: Set all secrets via Replit Secrets panel (padlock icon)
+# MONGODB_URI, JWT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+# DO NOT hardcode credentials in this file
 [env]
 NODE_OPTIONS = "--max-old-space-size=4096"
 

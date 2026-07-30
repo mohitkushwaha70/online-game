@@ -2,7 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import FooterWrapper from "@/components/layout/FooterWrapper";
+import SettingsProvider from "@/components/SettingsProvider";
+
 
 export const metadata: Metadata = {
   title: "ONLINE GAME - Free Browser Games",
@@ -32,9 +34,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="dark">
       <body className="min-h-screen bg-dark-950 text-white overflow-x-hidden">
         <AuthProvider>
-          <Header />
-          <main className="pt-12 sm:pt-14 lg:pt-16">{children}</main>
-          <Footer />
+          <SettingsProvider>
+            <Header />
+            <main className="pt-12 sm:pt-14 lg:pt-16">{children}</main>
+            <FooterWrapper />
+          </SettingsProvider>
         </AuthProvider>
       </body>
     </html>
