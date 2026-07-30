@@ -4,15 +4,18 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { Game } from '@/lib/types';
+import GameCard from '@/components/game/GameCard';
+import { addRecentGame } from '@/lib/recent-local';
 
 export default function GamePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [relatedGames, setRelatedGames] = useState<Game[]>([]);
 
   useEffect(() => {
     fetch(`/api/games/${slug}`)
@@ -22,8 +25,24 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
   }, [slug]);
 
   useEffect(() => {
-    if (user && game) {
-      fetch('/api/user/favorites')
+    if (!game?.category) return;
+    const catSlug = typeof game.category === 'object' ? game.category.slug : game.categorySlug;
+    if (!catSlug) return;
+    fetch(`/api/games?category=${catSlug}&limit=9`)
+      .then(res => res.json())
+      .then(data => {
+        const all = data.games || data || [];
+        setRelatedGames(all.filter((g: Game) => g._id !== game._id).slice(0, 8));
+      })
+      .catch(() => {});
+  }, [game]);
+
+  useEffect(() => {
+    if (!game) return;
+    fetch(`/api/games/${slug}/play`, { method: 'POST' });
+    addRecentGame(game);
+    if (user && token) {
+      fetch('/api/user/favorites', { headers: { Authorization: `Bearer ${token}` } })
         .then(res => res.json())
         .then(data => {
           const favorites = data.favorites || data || [];
@@ -31,13 +50,13 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
         })
         .catch(() => {});
     }
-  }, [user, game]);
+  }, [game]);
 
   const toggleFavorite = async () => {
     if (!user) { window.location.href = '/login'; return; }
     try {
       const method = isFavorite ? 'DELETE' : 'POST';
-      await fetch('/api/user/favorites', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ gameId: game?._id }) });
+      await fetch('/api/user/favorites', { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ gameId: game?._id }) });
       setIsFavorite(!isFavorite);
     } catch {}
   };
@@ -218,6 +237,23 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
             </div>
           </div>
 
+          {/* More Games */}
+          {relatedGames.length > 0 && (
+            <div className="mt-12 sm:mt-16">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-bold text-white">More {categoryName} Games</h2>
+              <Link href={`/category/${categorySlug}`} className="text-xs sm:text-sm text-purple-400 hover:text-purple-300 transition-colors">
+                View All →
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+              {relatedGames.map(g => (
+                <GameCard key={g._id} game={g} />
+              ))}
+            </div>
+            </div>
+          )}
+
           {/* Sidebar */}
           <aside className="space-y-6">
             <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
@@ -229,6 +265,43 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
                 <div className="flex justify-between"><span className="text-gray-400">Difficulty</span><span className="text-white capitalize">{game.difficulty || 'Medium'}</span></div>
               </div>
             </div>
+            {relatedGames.length > 0 && (
+              <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-bold text-white">More Games</h3>
+                  <Link href={`/category/${categorySlug}`} className="text-[10px] text-purple-400 hover:text-purple-300">View All</Link>
+                </div>
+                <div className="space-y-3">
+                  {relatedGames.slice(0, 5).map(g => {
+                    const catName = typeof g.category === 'object' && g.category ? (g.category as any).name : '';
+                    return (
+                      <Link key={g._id} href={`/game/${g.slug}`}
+                        className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition group border border-white/5"
+                      >
+                        <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 flex items-center justify-center text-xl font-bold text-white"
+                          style={{ background: g.color ? `linear-gradient(135deg, ${g.color}, ${g.color}88)` : 'linear-gradient(135deg, #7c3aed, #3B82F688)' }}
+                        >
+                          {g.thumbnail ? (
+                            <img src={g.thumbnail} alt={g.name} className="w-full h-full object-cover" />
+                          ) : g.name[0]}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold text-white truncate group-hover:text-purple-400 transition-colors">{g.name}</p>
+                          <p className="text-xs text-gray-400 truncate mt-0.5">{catName}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-[10px] text-yellow-400 flex items-center gap-0.5">
+                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                              {g.rating?.toFixed(1) || '0.0'}
+                            </span>
+                            <span className="text-[10px] text-gray-500">• {(g.totalPlays || 0).toLocaleString()} plays</span>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
               <h3 className="text-sm font-bold text-white mb-3">Share Game</h3>
               <button

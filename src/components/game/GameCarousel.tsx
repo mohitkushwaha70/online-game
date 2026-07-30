@@ -70,7 +70,7 @@ export default function GameCarousel({ title, games, viewAllLink }: GameCarousel
       >
         {games.map((game) => (
           <div key={game._id} className="flex-none w-[140px] sm:w-[180px] md:w-[200px] snap-start">
-            <GameCard game={game} />
+            <GameCard game={game} showFav />
           </div>
         ))}
       </div>

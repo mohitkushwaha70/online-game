@@ -1,4 +1,4 @@
-run = "npm run build && npm run start"
+run = "npm run start"
 entrypoint = "src/app/page.tsx"
 modules = ["nodejs-20"]
 
@@ -17,3 +17,11 @@ pattern = "**/*.ts"
 [[ports]]
 localPort = 3000
 externalPort = 80
+
+[[ports]]
+localPort = 3001
+externalPort = 3001
+
+[[ports]]
+localPort = 3002
+externalPort = 3002

@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import GameCard from '@/components/game/GameCard';
 import GameCarousel from '@/components/game/GameCarousel';
+import { useAuth } from '@/lib/auth-context';
 import { Game } from '@/lib/types';
+import { getRecentGames, addRecentGame, type RecentGameEntry } from '@/lib/recent-local';
 
 const categories = [
   { name: 'All', slug: 'all' },
@@ -17,10 +19,12 @@ const categories = [
 ];
 
 export default function HomePage() {
+  const { user, token } = useAuth();
   const [games, setGames] = useState<Game[]>([]);
   const [featuredGames, setFeaturedGames] = useState<Game[]>([]);
   const [newGames, setNewGames] = useState<Game[]>([]);
   const [popularGames, setPopularGames] = useState<Game[]>([]);
+  const [recentGames, setRecentGames] = useState<Game[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
   const [loading, setLoading] = useState(true);
@@ -85,7 +89,30 @@ export default function HomePage() {
       setLoading(false);
     };
     fetchSections();
-  }, []);
+    const localRecent = getRecentGames();
+    if (user && token) {
+      fetch('/api/user/recent', { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.json())
+        .then(d => {
+          const apiRecent: Game[] = d.recent || [];
+          if (localRecent.length > 0) {
+            const seen = new Set(apiRecent.map(g => g.slug));
+            const merged = [...apiRecent];
+            for (const lr of localRecent) {
+              if (!seen.has(lr.slug)) {
+                merged.push(lr as unknown as Game);
+              }
+            }
+            setRecentGames(merged);
+          } else {
+            setRecentGames(apiRecent);
+          }
+        })
+        .catch(() => { setRecentGames(localRecent as unknown as Game[]); });
+    } else if (localRecent.length > 0) {
+      setRecentGames(localRecent as unknown as Game[]);
+    }
+  }, [user, token]);
 
   useEffect(() => {
     setPage(1);
@@ -203,6 +230,7 @@ export default function HomePage() {
         {/* Carousels */}
         {showCarousels && !loading && (
           <div className="space-y-10 mb-12">
+            <GameCarousel title="Continue Watching" games={recentGames.length > 0 ? recentGames : popularGames} viewAllLink="/recently-played" />
             {featuredGames.length > 0 && (
               <GameCarousel title="Featured Games" games={featuredGames} viewAllLink="/?sort=featured" />
             )}

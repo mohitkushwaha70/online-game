@@ -6,13 +6,13 @@ import { useAuth } from '@/lib/auth-context';
 import { Game } from '@/lib/types';
 
 export default function FavoritesPage() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [favorites, setFavorites] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
-    fetch('/api/user/favorites')
+    if (!user || !token) return;
+    fetch('/api/user/favorites', { headers: { Authorization: `Bearer ${token}` } })
       .then(res => res.json())
       .then(data => { setFavorites(data.favorites || data || []); setLoading(false); })
       .catch(() => setLoading(false));

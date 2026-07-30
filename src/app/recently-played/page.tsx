@@ -4,29 +4,25 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { Game } from '@/lib/types';
+import { getRecentGames } from '@/lib/recent-local';
 
 export default function RecentlyPlayedPage() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [recentGames, setRecentGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
-    fetch('/api/user/recent')
-      .then(res => res.json())
-      .then(data => { setRecentGames(data.recent || data || []); setLoading(false); })
-      .catch(() => setLoading(false));
-  }, [user]);
-
-  if (!user) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4">
-        <h1 className="text-2xl font-bold text-white">Login Required</h1>
-        <p className="text-gray-400">Please login to view recently played games</p>
-        <Link href="/login" className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors min-h-[44px] flex items-center">Login</Link>
-      </div>
-    );
-  }
+    if (user && token) {
+      fetch('/api/user/recent', { headers: { Authorization: `Bearer ${token}` } })
+        .then(res => res.json())
+        .then(data => { setRecentGames(data.recent || data || []); setLoading(false); })
+        .catch(() => setLoading(false));
+    } else {
+      const local = getRecentGames();
+      setRecentGames(local as unknown as Game[]);
+      setLoading(false);
+    }
+  }, [user, token]);
 
   return (
     <div className="min-h-screen bg-dark-950 px-4 py-8 sm:py-12">

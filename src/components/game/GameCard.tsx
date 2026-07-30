@@ -1,16 +1,40 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Game } from '@/lib/types';
+import { useAuth } from '@/lib/auth-context';
 
 interface GameCardProps {
   game: Game;
+  showFav?: boolean;
 }
 
-export default function GameCard({ game }: GameCardProps) {
+export default function GameCard({ game, showFav }: GameCardProps) {
+  const { user, token } = useAuth();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [isFav, setIsFav] = useState(false);
+
+  useEffect(() => {
+    if (!showFav || !user) return;
+    fetch('/api/user/favorites', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json())
+      .then(d => setIsFav((d.favorites || []).some((g: Game) => g._id === game._id)))
+      .catch(() => {});
+  }, [user, token, game._id, showFav]);
+
+  const toggleFav = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) { window.location.href = '/login'; return; }
+    const method = isFav ? 'DELETE' : 'POST';
+    await fetch('/api/user/favorites', {
+      method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ gameId: game._id }),
+    });
+    setIsFav(!isFav);
+  };
 
   const categoryName = typeof game.category === 'object' && game.category ? game.category.name : (game.categorySlug || game.category || '');
   const hasImage = game.thumbnail && !imgError;
@@ -34,6 +58,13 @@ export default function GameCard({ game }: GameCardProps) {
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        {showFav && (
+          <button onClick={toggleFav} className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/40 hover:bg-black/60 transition z-10">
+            <svg className="w-4 h-4" fill={isFav ? '#ef4444' : 'none'} stroke={isFav ? '#ef4444' : '#fff'} strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </button>
+        )}
         <div className="absolute bottom-0 left-0 right-0 p-3">
           <h3 className="text-sm font-bold text-white truncate leading-tight">{game.name}</h3>
           <div className="flex items-center gap-2 mt-1">

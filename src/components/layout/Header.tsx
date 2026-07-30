@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { useSettings } from '@/components/SettingsProvider';
 import { motion, AnimatePresence } from 'framer-motion';
+import LogoIcon from '@/components/ui/LogoIcon';
 
 const categories = [
   { name: 'Action', slug: 'action' },
@@ -94,11 +95,7 @@ export default function Header() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 min-touch">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M21.58 16.09l-1.09-7.66C20.21 6.46 18.52 5 16.53 5H7.47C5.48 5 3.79 6.46 3.51 8.43l-1.09 7.66C2.2 17.63 3.39 19 4.94 19c.68 0 1.32-.34 1.68-.92L8 15h8l1.38 3.08c.36.58 1 .92 1.68.92 1.55 0 2.74-1.37 2.52-2.91zM9 10H7V8h2v2zm5 0h-2V8h2v2z" />
-            </svg>
-          </div>
+          <LogoIcon size={8} />
           <span className="hidden sm:block text-lg font-bold tracking-wider text-gradient">{siteName}</span>
         </Link>
 
@@ -166,7 +163,8 @@ export default function Header() {
           ) : (
             <Link
               href="/login"
-              className="hidden lg:block px-4 py-1.5 text-sm font-semibold bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-lg transition-all"
+              className="hidden lg:block px-4 py-1.5 text-sm font-semibold text-white rounded-lg transition-all"
+              style={{ background: 'linear-gradient(135deg, rgb(var(--brand-500-rgb)), rgb(var(--brand-400-rgb)))' }}
             >
               Login
             </Link>
@@ -213,14 +211,12 @@ export default function Header() {
               {/* Sticky Logo at top */}
               <div className="shrink-0 px-5 pt-5 pb-3 border-b border-white/5">
                 <Link href="/" onClick={closeMenu} className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M21.58 16.09l-1.09-7.66C20.21 6.46 18.52 5 16.53 5H7.47C5.48 5 3.79 6.46 3.51 8.43l-1.09 7.66C2.2 17.63 3.39 19 4.94 19c.68 0 1.32-.34 1.68-.92L8 15h8l1.38 3.08c.36.58 1 .92 1.68.92 1.55 0 2.74-1.37 2.52-2.91zM9 10H7V8h2v2zm5 0h-2V8h2v2z" />
-                    </svg>
-                  </div>
+                  <LogoIcon size={9} />
                   <div>
-                    <div className="text-base font-bold tracking-wider">
-                      <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">{siteName}</span>
+                    <div className="text-base font-bold tracking-wider"
+                      style={{ background: 'linear-gradient(135deg, rgb(var(--brand-400-rgb)), rgb(var(--brand-500-rgb)))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+                    >
+                      {siteName}
                     </div>
                     <div className="text-[10px] text-gray-500 uppercase tracking-widest">Premium Gaming</div>
                   </div>
@@ -384,7 +380,8 @@ export default function Header() {
                     <Link
                       href="/login"
                       onClick={closeMenu}
-                      className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl transition-all shadow-lg shadow-indigo-500/20 min-h-[48px]"
+                      className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold text-white rounded-xl transition-all min-h-[48px]"
+                      style={{ background: 'linear-gradient(135deg, rgb(var(--brand-500-rgb)), rgb(var(--brand-400-rgb)))', boxShadow: '0 10px 15px -3px rgb(var(--brand-500-rgb) / 0.2)' }}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
                       Login / Sign Up
