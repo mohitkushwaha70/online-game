@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useSettings } from '@/components/SettingsProvider';
 import { motion, AnimatePresence } from 'framer-motion';
 import LogoIcon from '@/components/ui/LogoIcon';
+import Avatar from '@/components/ui/Avatar';
 
 const categories = [
   { name: 'Home', slug: 'all' },
@@ -153,9 +154,7 @@ export default function Header() {
                 </Link>
               )}
               <Link href="/profile" className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-xs font-bold text-white">
-                  {user.username?.[0]?.toUpperCase() || 'U'}
-                </div>
+                <Avatar avatar={user.avatar} username={user.username} size={28} />
                 <span className="max-w-[100px] truncate">{user.username}</span>
               </Link>
             </div>
@@ -336,9 +335,7 @@ export default function Header() {
                 <div className="shrink-0 border-t border-white/5">
                   <div className="px-5 py-3 space-y-2">
                     <div className="flex items-center gap-3 px-3 py-2">
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white shrink-0">
-                        {user.username?.[0]?.toUpperCase() || 'U'}
-                      </div>
+                      <Avatar avatar={user.avatar} username={user.username} size={36} />
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-white truncate">{user.username}</p>
                         <p className="text-xs text-gray-500 truncate">{user.email}</p>

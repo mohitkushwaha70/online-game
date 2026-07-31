@@ -6,12 +6,14 @@ import { useAuth } from '@/lib/auth-context';
 import { Game } from '@/lib/types';
 import GameCard from '@/components/game/GameCard';
 import { addRecentGame } from '@/lib/recent-local';
+import Avatar from '@/components/ui/Avatar';
 
 export default function GamePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const { user, token } = useAuth();
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
+  const [comments, setComments] = useState<any[]>([]);
   const [comment, setComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -22,6 +24,10 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
       .then(res => res.json())
       .then(data => { setGame(data.game || data); setLoading(false); })
       .catch(() => setLoading(false));
+    fetch(`/api/games/${slug}/comments`)
+      .then(res => res.json())
+      .then(data => setComments(data.comments || []))
+      .catch(() => {});
   }, [slug]);
 
   useEffect(() => {
@@ -66,14 +72,14 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
     if (!comment.trim() || !user || !game) return;
     setSubmittingComment(true);
     try {
-      await fetch('/api/comments', {
+      await fetch(`/api/games/${slug}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ gameId: game._id, text: comment }),
+        body: JSON.stringify({ text: comment }),
       });
       setComment('');
-      const updatedData = await fetch(`/api/games/${slug}`).then(r => r.json());
-      setGame(updatedData.game || updatedData);
+      const updatedComments = await fetch(`/api/games/${slug}/comments`).then(r => r.json());
+      setComments(updatedComments.comments || []);
     } catch {}
     setSubmittingComment(false);
   };
@@ -193,7 +199,7 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
 
             {/* Comments */}
             <div className="mt-8 sm:mt-12">
-              <h2 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">Comments ({game.comments?.length || 0})</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">Comments ({comments.length})</h2>
               {user ? (
                 <form onSubmit={submitComment} className="mb-6 flex gap-2">
                   <input
@@ -217,17 +223,15 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
                 </p>
               )}
               <div className="space-y-3 sm:space-y-4">
-                {game.comments?.length === 0 ? (
+                {comments.length === 0 ? (
                   <p className="text-sm text-gray-500">No comments yet. Be the first to comment!</p>
                 ) : (
-                  game.comments?.slice().reverse().map((c, i) => (
+                  comments.slice().reverse().map((c, i) => (
                     <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-[10px] sm:text-xs font-bold text-white">
-                          {c.username?.[0]?.toUpperCase() || 'U'}
-                        </div>
-                        <span className="text-xs sm:text-sm font-medium text-white">{c.username}</span>
-                        <span className="text-[10px] sm:text-xs text-gray-500">{c.date ? new Date(c.date).toLocaleDateString() : ''}</span>
+                        <Avatar avatar={c.user?.avatar} username={c.user?.username || c.username} size={28} />
+                        <span className="text-xs sm:text-sm font-medium text-white">{c.user?.username || c.username}</span>
+                        <span className="text-[10px] sm:text-xs text-gray-500">{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : ''}</span>
                       </div>
                       <p className="text-xs sm:text-sm text-gray-300">{c.text}</p>
                     </div>

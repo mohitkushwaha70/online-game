@@ -1,0 +1,27 @@
+interface AvatarProps {
+  avatar?: string | null;
+  username?: string | null;
+  size?: number;
+  className?: string;
+}
+
+export default function Avatar({ avatar, username, size = 32, className = '' }: AvatarProps) {
+  if (avatar) {
+    return (
+      <img
+        src={avatar}
+        alt=""
+        className={`rounded-full object-cover shrink-0 ${className}`}
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+  return (
+    <div
+      className={`rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center font-bold text-white shrink-0 ${className}`}
+      style={{ width: size, height: size, fontSize: Math.max(10, Math.round(size * 0.4)) }}
+    >
+      {username?.[0]?.toUpperCase() || 'U'}
+    </div>
+  );
+}
