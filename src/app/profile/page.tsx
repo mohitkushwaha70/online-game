@@ -24,6 +24,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [hoverAvatar, setHoverAvatar] = useState('');
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -95,22 +96,21 @@ export default function ProfilePage() {
 
         {/* Avatar Modal */}
         {showAvatarModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setShowAvatarModal(false)}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => { setShowAvatarModal(false); setHoverAvatar(''); }}>
             <div className="bg-dark-800 border border-white/10 rounded-2xl p-6 w-full max-w-sm mx-4" onClick={e => e.stopPropagation()}>
               <h3 className="font-heading text-lg font-bold mb-4">Update Avatar</h3>
               <div className="flex flex-col items-center gap-4">
-                <div className="w-24 h-24 rounded-full overflow-hidden">
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
-                  ) : user.avatar ? (
-                    <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                <div className="w-28 h-28 rounded-full overflow-hidden shadow-lg border border-white/20">
+                  {hoverAvatar || avatarUrl || user.avatar ? (
+                    <img src={hoverAvatar || avatarUrl || user.avatar} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-4xl font-black text-white">
+                    <div className="w-full h-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-5xl font-black text-white">
                       {user.username?.[0]?.toUpperCase() || 'U'}
                     </div>
                   )}
                 </div>
-                <div className="grid grid-cols-5 gap-2 w-full">
+                <p className="text-xs text-gray-400 -mt-2">Preview — hover or click to see which one</p>
+                <div className="grid grid-cols-5 gap-2 w-full" onMouseLeave={() => setHoverAvatar('')}>
                   {[
                     ['#7c3aed','#3B82F6'], ['#ef4444','#f97316'], ['#10b981','#06b6d4'],
                     ['#f59e0b','#ef4444'], ['#8b5cf6','#ec4899'], ['#14b8a6','#3b82f6'],
@@ -122,12 +122,19 @@ export default function ProfilePage() {
                   ].map(([c1, c2], i) => {
                     const icons = ['🎮','🏆','⭐','👑','🚀','🔥','🛡️','❤️','⚡','👻','🎯','🌈','🌟','💎','🎲','🧩','🎪','🪄','🏅','🎸'];
                     const emoji = icons[i] || '';
+                    const uri = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='32' fill='url(#g)'/><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='${c1}'/><stop offset='100%' stop-color='${c2}'/></linearGradient></defs><text x='32' y='44' text-anchor='middle' font-size='30' fill='white'>${emoji}</text></svg>`)}`;
+                    const selected = avatarUrl === uri;
                     return (
-                      <button key={c1+c2} onClick={() => setAvatarUrl(`data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='32' fill='url(#g)'/><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='${c1}'/><stop offset='100%' stop-color='${c2}'/></linearGradient></defs><text x='32' y='44' text-anchor='middle' font-size='30' fill='white'>${emoji}</text></svg>`)}`)}
-                        className="w-full aspect-square rounded-full border-2 border-white/10 hover:border-white/40 transition overflow-hidden flex items-center justify-center text-lg"
+                      <button
+                        key={c1+c2}
+                        onClick={() => setAvatarUrl(uri)}
+                        onMouseEnter={() => setHoverAvatar(uri)}
+                        className={`w-full aspect-square rounded-full border-2 overflow-hidden flex items-center justify-center text-lg transition ${selected ? 'border-white scale-110' : 'border-white/10 hover:border-white/40'}`}
                         style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}
                         title={`Avatar ${i + 1}`}
-                      />
+                      >
+                        {emoji}
+                      </button>
                     );
                   })}
                 </div>
@@ -158,7 +165,7 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div className="flex gap-3 w-full">
-                  <button onClick={() => { setShowAvatarModal(false); setAvatarUrl(''); }} className="flex-1 py-2.5 bg-white/5 text-white/60 rounded-xl text-sm font-medium hover:bg-white/10 transition">Cancel</button>
+                  <button onClick={() => { setShowAvatarModal(false); setAvatarUrl(''); setHoverAvatar(''); }} className="flex-1 py-2.5 bg-white/5 text-white/60 rounded-xl text-sm font-medium hover:bg-white/10 transition">Cancel</button>
                   <button
                     onClick={async () => {
                       if (!avatarUrl || !token) return;
@@ -174,6 +181,7 @@ export default function ProfilePage() {
                           updateUser({ avatar: data.avatar });
                           setShowAvatarModal(false);
                           setAvatarUrl('');
+                          setHoverAvatar('');
                         }
                       } catch {}
                       setUploading(false);
