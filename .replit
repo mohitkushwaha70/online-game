@@ -1,6 +1,6 @@
 run = "npm run start"
 entrypoint = "src/app/page.tsx"
-modules = ["nodejs-20"]
+modules = ["nodejs-22"]
 
 [nix]
 channel = "stable-24_05"
