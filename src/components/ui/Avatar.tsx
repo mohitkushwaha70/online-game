@@ -18,7 +18,7 @@ export default function Avatar({ avatar, username, size = 32, className = '' }: 
   }
   return (
     <div
-      className={`rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center font-bold text-white shrink-0 ${className}`}
+      className={`rounded-full bg-gradient-to-r from-brand-500 to-brand-400 flex items-center justify-center font-bold text-white shrink-0 ${className}`}
       style={{ width: size, height: size, fontSize: Math.max(10, Math.round(size * 0.4)) }}
     >
       {username?.[0]?.toUpperCase() || 'U'}

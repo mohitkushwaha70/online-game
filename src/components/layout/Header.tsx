@@ -101,7 +101,7 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden lg:flex items-center gap-1">
-          <Link href="/" className="px-3 py-2 text-sm font-medium text-blue-400 hover:text-blue-300 rounded-lg transition-colors">
+          <Link href="/" className="px-3 py-2 text-sm font-medium text-brand-400 hover:text-brand-light rounded-lg transition-colors">
             Home
           </Link>
           {categories.slice(1, 7).map((cat) => (
@@ -122,7 +122,7 @@ export default function Header() {
             placeholder="Search games..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brand-500"
           />
           <button type="submit" className="p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Search">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,7 +148,7 @@ export default function Header() {
               {(user.role === 'admin' || user.role === 'superadmin') && (
                 <Link
                   href="/admin"
-                  className="px-3 py-1.5 text-sm font-medium text-purple-400 hover:text-purple-300 bg-purple-500/10 border border-purple-500/20 rounded-lg transition-colors"
+                  className="px-3 py-1.5 text-sm font-medium text-brand-400 hover:text-brand-light bg-brand-500/10 border border-brand-500/20 rounded-lg transition-colors"
                 >
                   Admin
                 </Link>
@@ -232,7 +232,7 @@ export default function Header() {
                     placeholder="Search games..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 min-h-[48px]"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-500 min-h-[48px]"
                   />
                 </form>
               </div>
@@ -273,17 +273,17 @@ export default function Header() {
               {/* Scrollable menu items */}
               <div className="flex-1 overflow-y-auto px-5 py-4 space-y-1">
                 <motion.div custom={2} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-white hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors">
+                  <Link href="/" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-white hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
                     <span className="text-xl">🏠</span> Home
                   </Link>
                 </motion.div>
                 <motion.div custom={3} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/?sort=popular" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors">
+                  <Link href="/?sort=popular" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
                     <span className="text-xl">🎮</span> All Games
                   </Link>
                 </motion.div>
                 <motion.div custom={4} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/?sort=newest" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors">
+                  <Link href="/?sort=newest" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
                     <span className="text-xl">⭐</span> New Games
                   </Link>
                 </motion.div>
@@ -291,17 +291,17 @@ export default function Header() {
                 <div className="border-t border-white/5 my-2" />
 
                 <motion.div custom={5} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/favorites" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors">
+                  <Link href="/favorites" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
                     <span className="text-xl">❤️</span> Favorites
                   </Link>
                 </motion.div>
                 <motion.div custom={6} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/recently-played" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors">
+                  <Link href="/recently-played" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
                     <span className="text-xl">🕒</span> Recently Played
                   </Link>
                 </motion.div>
                 <motion.div custom={7} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/profile" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors">
+                  <Link href="/profile" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
                     <span className="text-xl">👤</span> Profile
                   </Link>
                 </motion.div>
@@ -309,22 +309,22 @@ export default function Header() {
                 <div className="border-t border-white/5 my-2" />
 
                 <motion.div custom={8} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/contact" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors">
+                  <Link href="/contact" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
                     <span className="text-xl">📞</span> Contact
                   </Link>
                 </motion.div>
                 <motion.div custom={9} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/about" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors">
+                  <Link href="/about" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
                     <span className="text-xl">📄</span> About
                   </Link>
                 </motion.div>
                 <motion.div custom={10} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/privacy" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors">
+                  <Link href="/privacy" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
                     <span className="text-xl">🔒</span> Privacy Policy
                   </Link>
                 </motion.div>
                 <motion.div custom={11} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/terms" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors">
+                  <Link href="/terms" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
                     <span className="text-xl">📜</span> Terms of Service
                   </Link>
                 </motion.div>
@@ -341,7 +341,7 @@ export default function Header() {
                         <p className="text-xs text-gray-500 truncate">{user.email}</p>
                       </div>
                       {(user.role === 'admin' || user.role === 'superadmin') && (
-                        <Link href="/admin" onClick={closeMenu} className="ml-auto px-3 py-1 text-[10px] font-semibold bg-indigo-500/20 text-indigo-400 rounded-lg hover:bg-indigo-500/30 transition-colors shrink-0">
+                        <Link href="/admin" onClick={closeMenu} className="ml-auto px-3 py-1 text-[10px] font-semibold bg-brand-500/20 text-brand-400 rounded-lg hover:bg-brand-500/30 transition-colors shrink-0">
                           Admin
                         </Link>
                       )}
@@ -374,7 +374,7 @@ export default function Header() {
                 placeholder="Search games..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
+                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brand-500 min-h-[44px]"
               />
               <button
                 type="button"

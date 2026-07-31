@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   await connectDB();
   const u = await User.findById(user._id);
   if (!u) return NextResponse.json({ error: 'User not found' }, { status: 404 });
-  if (!u.favorites.includes(gameId)) u.favorites.push(gameId);
+  if (!u.favorites.some(id => id.toString() === gameId)) u.favorites.push(gameId);
   await u.save();
   const populated = await User.findById(user._id).populate('favorites');
   return NextResponse.json({ favorites: populated?.favorites || [] });

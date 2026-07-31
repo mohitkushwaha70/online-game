@@ -68,7 +68,7 @@ export default function GameCard({ game, showFav }: GameCardProps) {
         <div className="absolute bottom-0 left-0 right-0 p-3">
           <h3 className="text-sm font-bold text-white truncate leading-tight">{game.name}</h3>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-[10px] sm:text-xs text-purple-400 font-medium truncate">{categoryName}</span>
+            <span className="text-[10px] sm:text-xs text-brand-400 font-medium truncate">{categoryName}</span>
             <span className="text-[10px] sm:text-xs text-gray-400">•</span>
             <span className="text-[10px] sm:text-xs text-yellow-400 flex items-center gap-0.5">
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -79,7 +79,7 @@ export default function GameCard({ game, showFav }: GameCardProps) {
           </div>
         </div>
         {game.isFeatured && (
-          <div className="absolute top-2 left-2 px-2 py-0.5 bg-purple-500 text-white text-[10px] font-bold rounded-full">
+          <div className="absolute top-2 left-2 px-2 py-0.5 bg-brand-500 text-white text-[10px] font-bold rounded-full">
             HOT
           </div>
         )}

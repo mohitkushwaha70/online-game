@@ -11,11 +11,11 @@ export async function POST(req: NextRequest) {
     if (await User.findOne({ $or: [{ email }, { username }] })) {
       return NextResponse.json({ error: 'User already exists' }, { status: 400 });
     }
-    const user = await User.create({ username, email, password, role: 'user', displayName: username });
+    const user = await User.create({ username, email, password, role: 'user', displayName: username, coins: 100, xp: 50, level: 1, premium: { isActive: false, expiresAt: null, plan: '' } });
     const token = signToken(user._id.toString(), user.role);
     return NextResponse.json({
       token,
-      user: { id: user._id, username: user.username, email: user.email, role: user.role, displayName: user.displayName },
+      user: { id: user._id, username: user.username, email: user.email, role: user.role, displayName: user.displayName, avatar: user.avatar || '', coins: user.coins, xp: user.xp, level: user.level, premium: user.premium },
     }, { status: 201 });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

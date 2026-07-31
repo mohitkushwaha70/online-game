@@ -22,6 +22,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     await connectDB();
     const { id } = await params;
     const body = await req.json();
+    if (body.category && !body.categorySlug) {
+      const cat = await Category.findById(body.category);
+      if (cat) body.categorySlug = cat.slug;
+    }
     const game = await Game.findByIdAndUpdate(id, { ...body, updatedAt: new Date() }, { new: true });
     if (!game) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     return NextResponse.json({ game });

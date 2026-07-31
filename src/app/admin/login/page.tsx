@@ -35,11 +35,11 @@ export default function AdminLoginPage() {
             <LogoIcon size={10} />
             <span className="text-xl font-bold tracking-wider text-gradient">ONLINE GAME</span>
           </Link>
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full mb-4">
-            <svg className="w-4 h-4 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-500/10 border border-brand-500/20 rounded-full mb-4">
+            <svg className="w-4 h-4 text-brand-400" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
             </svg>
-            <span className="text-sm font-medium text-purple-400">Admin Access</span>
+            <span className="text-sm font-medium text-brand-400">Admin Access</span>
           </div>
           <h1 className="text-2xl font-bold text-white">Admin Login</h1>
           <p className="text-sm text-gray-400 mt-2">Authorized personnel only</p>
@@ -53,7 +53,7 @@ export default function AdminLoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brand-500 min-h-[44px]"
                 placeholder="admin@onlinegame.com"
                 required
               />
@@ -64,7 +64,7 @@ export default function AdminLoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brand-500 min-h-[44px]"
                 placeholder="Enter admin password"
                 required
               />
@@ -73,7 +73,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:opacity-50 text-white font-bold rounded-lg transition-all text-sm min-h-[44px]"
+              className="w-full py-3 bg-gradient-to-r from-brand-500 to-brand-400 hover:from-brand-light hover:to-brand-400 disabled:opacity-50 text-white font-bold rounded-lg transition-all text-sm min-h-[44px]"
             >
               {loading ? 'Verifying...' : 'Login to Admin Panel'}
             </button>

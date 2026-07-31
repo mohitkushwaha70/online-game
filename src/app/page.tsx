@@ -51,6 +51,10 @@ export default function HomePage() {
     if (params.get('search')) {
       setSearchQuery(params.get('search') || '');
     }
+    const s = params.get('sort');
+    if (s === 'newest' || s === 'popular' || s === 'rating' || s === 'name') {
+      setSortBy(s);
+    }
   }, []);
 
   const fetchGames = useCallback(async (pageNum: number, category: string, sort: string, search: string, append = false) => {
@@ -68,11 +72,11 @@ export default function HomePage() {
       const data = await res.json();
 
       if (append) {
-        setGames(prev => [...prev, ...data.games]);
+        setGames(prev => [...prev, ...(data.games || [])]);
       } else {
-        setGames(data.games);
+        setGames(data.games || []);
       }
-      setHasMore(data.page < data.pages);
+      setHasMore((data.page || 1) < (data.pages || 1));
     } catch (error) {
       console.error('Failed to fetch games:', error);
     }
@@ -205,7 +209,7 @@ export default function HomePage() {
             100+ handpicked browser games. Action, racing, puzzles — play anything, anywhere, instantly.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 px-4">
-            <Link href="#games" className="group relative px-8 py-3.5 text-white font-bold rounded-xl transition-all text-center min-h-[48px] flex items-center justify-center text-sm sm:text-base hover:scale-105" style={{ background: 'linear-gradient(135deg, rgb(var(--brand-500-rgb)), rgb(var(--brand-500-rgb) 0.8))', boxShadow: '0 10px 15px -3px rgb(var(--brand-500-rgb) / 0.25)' }}>
+            <Link href="#games" className="group relative px-8 py-3.5 text-white font-bold rounded-xl transition-all text-center min-h-[48px] flex items-center justify-center text-sm sm:text-base hover:scale-105" style={{ background: 'linear-gradient(135deg, rgb(var(--brand-500-rgb)), rgb(var(--brand-500-rgb) / 0.85))', boxShadow: '0 10px 15px -3px rgb(var(--brand-500-rgb) / 0.25)' }}>
               <span className="relative z-10 flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 Start Playing
@@ -313,7 +317,7 @@ export default function HomePage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full sm:w-auto px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-gray-300 focus:outline-none focus:border-purple-500 min-h-[44px] appearance-none"
+              className="w-full sm:w-auto px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-gray-300 focus:outline-none focus:border-brand-500 min-h-[44px] appearance-none"
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '20px' }}
             >
               <option value="newest">Newest First</option>
@@ -346,7 +350,7 @@ export default function HomePage() {
             {loadingMore && (
               <div className="flex justify-center py-8">
                 <div className="flex items-center gap-2 text-gray-400">
-                  <div className="w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
                   <span>Loading more games...</span>
                 </div>
               </div>

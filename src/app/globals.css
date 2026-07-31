@@ -43,7 +43,7 @@ img, video, iframe { max-width: 100%; height: auto; }
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: #1a1b28; }
 ::-webkit-scrollbar-thumb { background: #3a3f4e; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #7c3aed; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--brand-500-rgb)); }
 
 @layer utilities {
   .glass { @apply bg-white/5 backdrop-blur-xl border border-white/10; }

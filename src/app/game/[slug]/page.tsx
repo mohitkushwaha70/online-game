@@ -47,16 +47,18 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
     if (!game) return;
     fetch(`/api/games/${slug}/play`, { method: 'POST' });
     addRecentGame(game);
-    if (user && token) {
-      fetch('/api/user/favorites', { headers: { Authorization: `Bearer ${token}` } })
-        .then(res => res.json())
-        .then(data => {
-          const favorites = data.favorites || data || [];
-          setIsFavorite(favorites.some((g: Game) => g._id === game._id));
-        })
-        .catch(() => {});
-    }
-  }, [game]);
+  }, [game, slug]);
+
+  useEffect(() => {
+    if (!game || !user || !token) return;
+    fetch('/api/user/favorites', { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => res.json())
+      .then(data => {
+        const favorites = data.favorites || data || [];
+        setIsFavorite(favorites.some((g: Game) => g._id === game._id));
+      })
+      .catch(() => {});
+  }, [game, user, token]);
 
   const toggleFavorite = async () => {
     if (!user) { window.location.href = '/login'; return; }
@@ -72,11 +74,12 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
     if (!comment.trim() || !user || !game) return;
     setSubmittingComment(true);
     try {
-      await fetch(`/api/games/${slug}/comments`, {
+      const res = await fetch(`/api/games/${slug}/comments`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ text: comment }),
       });
+      if (!res.ok) return;
       setComment('');
       const updatedComments = await fetch(`/api/games/${slug}/comments`).then(r => r.json());
       setComments(updatedComments.comments || []);
@@ -90,7 +93,7 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -99,7 +102,7 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4">
         <h1 className="text-2xl font-bold text-white">Game Not Found</h1>
-        <Link href="/" className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors min-h-[44px] flex items-center">
+        <Link href="/" className="px-6 py-3 bg-brand-500 text-white rounded-lg hover:bg-brand-400 transition-colors min-h-[44px] flex items-center">
           Back to Home
         </Link>
       </div>
@@ -149,7 +152,7 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-3">
-                <span className="text-xs sm:text-sm text-purple-400 font-medium">{categoryName}</span>
+                <span className="text-xs sm:text-sm text-brand-400 font-medium">{categoryName}</span>
                 <span className="text-gray-600">•</span>
                 <span className="text-xs sm:text-sm text-yellow-400 flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
@@ -207,27 +210,27 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     placeholder="Add a comment..."
-                    className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
+                    className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brand-500 min-h-[44px]"
                   />
                   <button
                     type="submit"
                     disabled={submittingComment || !comment.trim()}
-                    className="px-4 sm:px-6 py-3 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-colors min-h-[44px] flex items-center justify-center flex-shrink-0"
+                    className="px-4 sm:px-6 py-3 bg-brand-500 hover:bg-brand-400 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-colors min-h-[44px] flex items-center justify-center flex-shrink-0"
                   >
                     {submittingComment ? '...' : 'Post'}
                   </button>
                 </form>
               ) : (
                 <p className="mb-6 text-sm text-gray-400">
-                  <Link href="/login" className="text-purple-400 hover:text-purple-300">Login</Link> to comment
+                  <Link href="/login" className="text-brand-400 hover:text-brand-light">Login</Link> to comment
                 </p>
               )}
               <div className="space-y-3 sm:space-y-4">
                 {comments.length === 0 ? (
                   <p className="text-sm text-gray-500">No comments yet. Be the first to comment!</p>
                 ) : (
-                  comments.slice().reverse().map((c, i) => (
-                    <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4">
+                  comments.map((c, i) => (
+                    <div key={c._id || i} className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Avatar avatar={c.user?.avatar} username={c.user?.username || c.username} size={28} />
                         <span className="text-xs sm:text-sm font-medium text-white">{c.user?.username || c.username}</span>
@@ -246,7 +249,7 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
             <div className="mt-12 sm:mt-16">
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <h2 className="text-lg sm:text-xl font-bold text-white">More {categoryName} Games</h2>
-              <Link href={`/category/${categorySlug}`} className="text-xs sm:text-sm text-purple-400 hover:text-purple-300 transition-colors">
+              <Link href={`/category/${categorySlug}`} className="text-xs sm:text-sm text-brand-400 hover:text-brand-light transition-colors">
                 View All →
               </Link>
             </div>
@@ -273,7 +276,7 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
               <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-bold text-white">More Games</h3>
-                  <Link href={`/category/${categorySlug}`} className="text-[10px] text-purple-400 hover:text-purple-300">View All</Link>
+                  <Link href={`/category/${categorySlug}`} className="text-[10px] text-brand-400 hover:text-brand-light">View All</Link>
                 </div>
                 <div className="space-y-3">
                   {relatedGames.slice(0, 5).map(g => {
@@ -290,7 +293,7 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
                           ) : g.name[0]}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold text-white truncate group-hover:text-purple-400 transition-colors">{g.name}</p>
+                          <p className="text-sm font-semibold text-white truncate group-hover:text-brand-400 transition-colors">{g.name}</p>
                           <p className="text-xs text-gray-400 truncate mt-0.5">{catName}</p>
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-[10px] text-yellow-400 flex items-center gap-0.5">

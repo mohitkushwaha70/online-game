@@ -76,7 +76,7 @@ export default function LoginPage() {
       if (isLogin) {
         await login(email, password);
       } else {
-        await register(email, password, username);
+        await register(username, email, password);
       }
       router.push('/');
     } catch (err: any) {
@@ -101,7 +101,7 @@ export default function LoginPage() {
           <div ref={googleBtnRef} className="w-full flex justify-center" />
           {loading && (
             <div className="flex items-center justify-center gap-2 mt-3 text-sm text-gray-400">
-              <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
               Signing in...
             </div>
           )}
@@ -122,7 +122,7 @@ export default function LoginPage() {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brand-500 min-h-[44px]"
                   placeholder="Enter username"
                   required={!isLogin}
                 />
@@ -134,8 +134,8 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
-                placeholder="Enter email"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brand-500 min-h-[44px]"
+                  placeholder="Enter email"
                 required
               />
             </div>
@@ -145,8 +145,8 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
-                placeholder="Enter password"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brand-500 min-h-[44px]"
+                  placeholder="Enter password"
                 required
               />
             </div>
@@ -154,7 +154,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:opacity-50 text-white font-bold rounded-lg transition-all text-sm min-h-[44px]"
+              className="w-full py-3 bg-gradient-to-r from-brand-500 to-brand-400 hover:from-brand-light hover:to-brand-400 disabled:opacity-50 text-white font-bold rounded-lg transition-all text-sm min-h-[44px]"
             >
               {loading ? 'Please wait...' : isLogin ? 'Login' : 'Register'}
             </button>
@@ -163,7 +163,7 @@ export default function LoginPage() {
           <div className="mt-4 text-center">
             <button
               onClick={() => { setIsLogin(!isLogin); setError(''); }}
-              className="text-sm text-purple-400 hover:text-purple-300"
+              className="text-sm text-brand-400 hover:text-brand-light"
             >
               {isLogin ? "Don't have an account? Register" : 'Already have an account? Login'}
             </button>

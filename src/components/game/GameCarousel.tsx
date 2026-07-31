@@ -34,7 +34,7 @@ export default function GameCarousel({ title, games, viewAllLink }: GameCarousel
         <h2 className="text-lg sm:text-xl font-bold text-white">{title}</h2>
         <div className="flex items-center gap-2">
           {viewAllLink && (
-            <Link href={viewAllLink} className="text-xs sm:text-sm text-purple-400 hover:text-purple-300 font-medium">
+            <Link href={viewAllLink} className="text-xs sm:text-sm text-brand-400 hover:text-brand-light font-medium">
               View All →
             </Link>
           )}

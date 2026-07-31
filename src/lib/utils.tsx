@@ -57,7 +57,7 @@ export function Badge({ type }: { type: string }) {
     hot: { label: '🔥 Hot', cls: 'bg-red-500/20 text-red-400 border-red-500/30' },
     new: { label: '✨ New', cls: 'bg-green-500/20 text-green-400 border-green-500/30' },
     top: { label: '⭐ Top', cls: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
-    originals: { label: '💎 OG', cls: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
+    originals: { label: '💎 OG', cls: 'bg-brand-500/20 text-brand-400 border-brand-500/30' },
     updated: { label: '🔄 Up', cls: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
   };
   const b = map[type];

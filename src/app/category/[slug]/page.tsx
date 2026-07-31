@@ -103,7 +103,7 @@ function CategoryContent({ params }: { params: Promise<{ slug: string }> }) {
         {/* Sort */}
         <div className="flex justify-end mb-6">
           <select value={sortBy} onChange={e => setSortBy(e.target.value)}
-            className="w-full sm:w-auto px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-gray-300 focus:outline-none focus:border-purple-500 min-h-[44px] appearance-none"
+            className="w-full sm:w-auto px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-gray-300 focus:outline-none focus:border-brand-500 min-h-[44px] appearance-none"
             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '20px' }}>
             <option value="-totalPlays">Most Popular</option>
             <option value="-createdAt">Newest</option>
@@ -120,7 +120,7 @@ function CategoryContent({ params }: { params: Promise<{ slug: string }> }) {
           <div className="text-center py-16">
             <div className="text-5xl mb-4 opacity-30">🎮</div>
             <p className="text-gray-400 text-lg mb-4">No games in this category yet</p>
-            <Link href="/" className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all min-h-[44px] inline-flex items-center font-semibold">
+            <Link href="/" className="px-6 py-3 bg-gradient-to-r from-brand-500 to-brand-400 text-white rounded-xl hover:shadow-lg transition-all min-h-[44px] inline-flex items-center font-semibold">
               Browse All Games
             </Link>
           </div>

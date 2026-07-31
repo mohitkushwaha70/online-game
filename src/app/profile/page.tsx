@@ -38,9 +38,9 @@ export default function ProfilePage() {
           fetch('/api/user/comments', { headers: { Authorization: `Bearer ${token}` } }),
         ]);
         const [favData, recentData, reviewData] = await Promise.all([favRes.json(), recentRes.json(), reviewRes.json()]);
-        setFavorites(favData.favorites || favData || []);
-        setRecentGames(recentData.recent || recentData || []);
-        setReviews(reviewData.comments || []);
+        setFavorites(Array.isArray(favData.favorites) ? favData.favorites : []);
+        setRecentGames(Array.isArray(recentData.recent) ? recentData.recent : []);
+        setReviews(Array.isArray(reviewData.comments) ? reviewData.comments : []);
       } catch {}
       setLoading(false);
     };
@@ -54,11 +54,11 @@ export default function ProfilePage() {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6 lg:p-8 mb-8">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-            <button onClick={() => setShowAvatarModal(true)} className="relative group w-20 h-20 rounded-full overflow-hidden flex-shrink-0">
+            <button onClick={() => setShowAvatarModal(true)} className="relative group w-20 h-20 rounded-full overflow-hidden flex-shrink-0 bg-gradient-to-r from-brand-500 to-brand-400">
               {user.avatar ? (
-                <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                <img src={user.avatar} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-3xl font-black text-white">
+                <div className="w-full h-full bg-gradient-to-r from-brand-500 to-brand-400 flex items-center justify-center text-3xl font-black text-white">
                   {user.username?.[0]?.toUpperCase() || 'U'}
                 </div>
               )}
@@ -70,7 +70,10 @@ export default function ProfilePage() {
               <h1 className="text-xl sm:text-2xl font-bold text-white truncate">{user.username}</h1>
               <p className="text-sm text-gray-400 truncate">{user.email}</p>
               {user.role === 'admin' && (
-                <span className="inline-block mt-2 px-3 py-1 bg-purple-500/20 text-purple-400 text-xs font-medium rounded-full border border-purple-500/30">Admin</span>
+                <span className="inline-block mt-2 px-3 py-1 bg-brand-500/20 text-brand-400 text-xs font-medium rounded-full border border-brand-500/30">Admin</span>
+              )}
+              {(user.premium?.isActive || user.premium?.plan) && (
+                <span className="inline-block mt-2 px-3 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-medium rounded-full border border-yellow-500/30">Premium</span>
               )}
             </div>
           </div>
@@ -104,7 +107,7 @@ export default function ProfilePage() {
                   {hoverAvatar || avatarUrl || user.avatar ? (
                     <img src={hoverAvatar || avatarUrl || user.avatar} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-5xl font-black text-white">
+                    <div className="w-full h-full bg-gradient-to-r from-brand-500 to-brand-400 flex items-center justify-center text-5xl font-black text-white">
                       {user.username?.[0]?.toUpperCase() || 'U'}
                     </div>
                   )}
@@ -161,7 +164,7 @@ export default function ProfilePage() {
                     placeholder="Or paste image URL..."
                     value={avatarUrl}
                     onChange={e => setAvatarUrl(e.target.value)}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-purple-500"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-brand-500"
                   />
                 </div>
                 <div className="flex gap-3 w-full">
@@ -187,7 +190,7 @@ export default function ProfilePage() {
                       setUploading(false);
                     }}
                     disabled={uploading || !avatarUrl}
-                    className="flex-1 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition disabled:opacity-50"
+                    className="flex-1 py-2.5 bg-gradient-to-r from-brand-500 to-brand-400 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition disabled:opacity-50"
                   >
                     {uploading ? 'Saving...' : 'Save'}
                   </button>
@@ -198,13 +201,13 @@ export default function ProfilePage() {
         )}
 
         <div className="flex gap-2 mb-6 overflow-x-auto hide-scrollbar">
-          <button onClick={() => setActiveTab('favorites')} className={`px-4 sm:px-6 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap min-h-[44px] ${activeTab === 'favorites' ? 'bg-purple-600 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}>
+          <button onClick={() => setActiveTab('favorites')} className={`px-4 sm:px-6 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap min-h-[44px] ${activeTab === 'favorites' ? 'bg-brand-500 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}>
             Favorites ({favorites.length})
           </button>
-          <button onClick={() => setActiveTab('recent')} className={`px-4 sm:px-6 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap min-h-[44px] ${activeTab === 'recent' ? 'bg-purple-600 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}>
+          <button onClick={() => setActiveTab('recent')} className={`px-4 sm:px-6 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap min-h-[44px] ${activeTab === 'recent' ? 'bg-brand-500 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}>
             Recently Played ({recentGames.length})
           </button>
-          <button onClick={() => setActiveTab('reviews')} className={`px-4 sm:px-6 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap min-h-[44px] ${activeTab === 'reviews' ? 'bg-purple-600 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}>
+          <button onClick={() => setActiveTab('reviews')} className={`px-4 sm:px-6 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap min-h-[44px] ${activeTab === 'reviews' ? 'bg-brand-500 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}>
             Reviews ({reviews.length})
           </button>
         </div>
@@ -227,7 +230,7 @@ export default function ProfilePage() {
                       {r.game.thumbnail ? <img src={r.game.thumbnail} alt="" className="w-full h-full object-cover" /> : r.game.name[0]}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-white group-hover:text-purple-400 transition-colors truncate">{r.game.name}</p>
+                      <p className="text-sm font-semibold text-white group-hover:text-brand-400 transition-colors truncate">{r.game.name}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <div className="flex items-center gap-0.5">
                           {[1,2,3,4,5].map(s => (
@@ -260,7 +263,7 @@ export default function ProfilePage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-3">
                     <h3 className="text-sm font-bold text-white truncate">{game.name}</h3>
-                    <span className="text-xs text-purple-400">{typeof game.category === 'object' && game.category ? game.category.name : game.categorySlug || ''}</span>
+                    <span className="text-xs text-brand-400">{typeof game.category === 'object' && game.category ? game.category.name : game.categorySlug || ''}</span>
                   </div>
                 </div>
               </Link>

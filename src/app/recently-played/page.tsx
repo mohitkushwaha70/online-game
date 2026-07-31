@@ -35,7 +35,7 @@ export default function RecentlyPlayedPage() {
         ) : recentGames.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-gray-400 text-lg mb-4">No recently played games</p>
-            <Link href="/" className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors min-h-[44px] inline-flex items-center">Browse Games</Link>
+            <Link href="/" className="px-6 py-3 bg-brand-500 text-white rounded-lg hover:bg-brand-400 transition-colors min-h-[44px] inline-flex items-center">Browse Games</Link>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
@@ -52,7 +52,7 @@ export default function RecentlyPlayedPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-3">
                     <h3 className="text-sm font-bold text-white truncate">{game.name}</h3>
-                    <span className="text-xs text-purple-400">{typeof game.category === 'object' && game.category ? game.category.name : game.categorySlug || ''}</span>
+                    <span className="text-xs text-brand-400">{typeof game.category === 'object' && game.category ? game.category.name : game.categorySlug || ''}</span>
                   </div>
                 </div>
               </Link>

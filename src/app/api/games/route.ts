@@ -16,7 +16,13 @@ export async function GET(req: NextRequest) {
     if (isPremium === 'true') query.isPremium = true;
     if (isFeatured === 'true') query.isFeatured = true;
     if (label) query.labels = { $in: [label] };
-    if (search) query.$text = { $search: search };
+    if (search) {
+      const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      query.$or = [
+        { name: { $regex: escaped, $options: 'i' } },
+        { description: { $regex: escaped, $options: 'i' } },
+      ];
+    }
     const games = await Game.find(query).populate('category', 'name slug color').sort(sort).skip((p - 1) * l).limit(l);
     const total = await Game.countDocuments(query);
     const response = NextResponse.json({ games, total, page: p, pages: Math.ceil(total / l) });

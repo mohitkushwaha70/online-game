@@ -4,8 +4,10 @@ import { Category } from '@/lib/models';
 import { authMiddleware, adminMiddleware } from '@/lib/auth';
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const user = await authMiddleware(req);
+    if (!user || !await adminMiddleware(user)) return NextResponse.json({ error: 'Admin required' }, { status: 403 });
     const categories = await Category.find().sort('sortOrder name');
     return NextResponse.json({ categories });
   } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 500 }); }

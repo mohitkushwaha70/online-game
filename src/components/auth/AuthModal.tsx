@@ -36,7 +36,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       if (isLogin) {
         await login(email, password);
       } else {
-        await register(email, password, username);
+        await register(username, email, password);
       }
       onClose();
     } catch (err: any) {
@@ -66,7 +66,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brand-500 min-h-[44px]"
               placeholder="Username"
               required={!isLogin}
             />
@@ -75,7 +75,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
+            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brand-500 min-h-[44px]"
             placeholder="Email"
             required
           />
@@ -83,7 +83,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[44px]"
+            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brand-500 min-h-[44px]"
             placeholder="Password"
             required
           />
@@ -91,14 +91,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:opacity-50 text-white font-bold rounded-lg transition-all min-h-[44px]"
+            className="w-full py-3 bg-gradient-to-r from-brand-500 to-brand-400 hover:from-brand-light hover:to-brand-400 disabled:opacity-50 text-white font-bold rounded-lg transition-all min-h-[44px]"
           >
             {loading ? '...' : isLogin ? 'Login' : 'Register'}
           </button>
         </form>
         <button
           onClick={() => { setIsLogin(!isLogin); setError(''); }}
-          className="w-full mt-3 text-sm text-purple-400 hover:text-purple-300 text-center"
+          className="w-full mt-3 text-sm text-brand-400 hover:text-brand-light text-center"
         >
           {isLogin ? "Don't have an account? Register" : 'Already have an account? Login'}
         </button>

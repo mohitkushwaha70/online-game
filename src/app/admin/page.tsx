@@ -54,6 +54,7 @@ export default function AdminPage() {
   useEffect(() => {
     if (!authReady) return;
     if (page === 'dashboard') api('/api/admin/dashboard').then(d => d && setDashData(d));
+    if (page === 'analytics') api('/api/admin/dashboard').then(d => d && setDashData(d));
     if (page === 'games') api('/api/admin/games').then(d => d && setGames(d.games || []));
     if (page === 'categories') api('/api/admin/categories').then(d => d && setCategories(d.categories || []));
     if (page === 'users') api('/api/admin/users').then(d => d && setUsers(d.users || []));
