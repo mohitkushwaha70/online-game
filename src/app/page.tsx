@@ -8,6 +8,22 @@ import { useAuth } from '@/lib/auth-context';
 import { Game } from '@/lib/types';
 import { getRecentGames, addRecentGame, type RecentGameEntry } from '@/lib/recent-local';
 
+const categories = [
+  { name: 'Home', slug: 'all' },
+  { name: 'Action', slug: 'action' },
+  { name: 'Adventure', slug: 'adventure' },
+  { name: 'Arcade', slug: 'arcade' },
+  { name: 'Racing', slug: 'racing' },
+  { name: 'Sports', slug: 'sports' },
+  { name: 'RPG', slug: 'rpg' },
+  { name: 'Strategy', slug: 'strategy' },
+  { name: 'Horror', slug: 'horror' },
+  { name: 'Puzzle', slug: 'puzzle' },
+  { name: 'Multiplayer', slug: 'multiplayer' },
+  { name: 'Casual', slug: 'casual' },
+  { name: 'Simulation', slug: 'simulation' },
+];
+
 export default function HomePage() {
   const { user, token } = useAuth();
   const [games, setGames] = useState<Game[]>([]);
@@ -243,6 +259,25 @@ export default function HomePage() {
             Search
           </button>
         </form>
+
+        {/* Game Categories */}
+        <div className="mb-6">
+          <div className="flex gap-2 sm:gap-3 overflow-x-auto sm:overflow-visible sm:flex-wrap pb-2 sm:pb-0 hide-scrollbar">
+            {categories.map((cat) => (
+              <button
+                key={cat.slug}
+                onClick={() => setSelectedCategory(cat.slug)}
+                className={`flex-none sm:flex-1 sm:min-w-[110px] px-4 sm:px-5 py-2.5 sm:py-3 min-h-[44px] rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 border inline-flex items-center justify-center ${
+                  selectedCategory === cat.slug
+                    ? 'bg-red-600 text-white border-red-500 shadow-lg shadow-red-500/25 scale-[1.04]'
+                    : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 hover:text-white hover:border-white/25 hover:scale-[1.03] hover:shadow-lg hover:shadow-black/20'
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Login / Sign Up */}
         {!user && (

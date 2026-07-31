@@ -8,22 +8,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LogoIcon from '@/components/ui/LogoIcon';
 import Avatar from '@/components/ui/Avatar';
 
-const categories = [
-  { name: 'Home', slug: 'all' },
-  { name: 'Action', slug: 'action' },
-  { name: 'Adventure', slug: 'adventure' },
-  { name: 'Arcade', slug: 'arcade' },
-  { name: 'Racing', slug: 'racing' },
-  { name: 'Sports', slug: 'sports' },
-  { name: 'RPG', slug: 'rpg' },
-  { name: 'Strategy', slug: 'strategy' },
-  { name: 'Horror', slug: 'horror' },
-  { name: 'Puzzle', slug: 'puzzle' },
-  { name: 'Multiplayer', slug: 'multiplayer' },
-  { name: 'Casual', slug: 'casual' },
-  { name: 'Simulation', slug: 'simulation' },
-];
-
 export default function Header() {
   const { user, logout } = useAuth();
   const { siteName } = useSettings();
@@ -104,15 +88,6 @@ export default function Header() {
           <Link href="/" className="px-3 py-2 text-sm font-medium text-brand-400 hover:text-brand-light rounded-lg transition-colors">
             Home
           </Link>
-          {categories.slice(1, 7).map((cat) => (
-            <Link
-              key={cat.slug}
-              href={`/category/${cat.slug}`}
-              className="px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-            >
-              {cat.name}
-            </Link>
-          ))}
         </nav>
 
         {/* Desktop search */}
@@ -237,24 +212,8 @@ export default function Header() {
                 </form>
               </div>
 
-              {/* Categories + Login section */}
+              {/* Login section */}
               <div className="shrink-0 px-5 py-4 border-b border-white/5 space-y-4">
-                <motion.div variants={itemVariants} initial="hidden" animate="visible" custom={0}>
-                  <div className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold mb-2.5">Game Categories</div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {categories.map((cat) => (
-                      <Link
-                        key={cat.slug}
-                        href={cat.slug === 'all' ? '/' : `/category/${cat.slug}`}
-                        onClick={closeMenu}
-                        className="px-4 py-2.5 min-h-[44px] rounded-xl text-sm font-semibold bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 hover:text-white hover:border-white/25 transition-all inline-flex items-center justify-center"
-                      >
-                        {cat.name}
-                      </Link>
-                    ))}
-                  </div>
-                </motion.div>
-
                 {!user && (
                   <motion.div variants={itemVariants} initial="hidden" animate="visible" custom={1}>
                     <Link
