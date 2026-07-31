@@ -123,7 +123,7 @@ export default function ProfilePage() {
                     const icons = ['🎮','🏆','⭐','👑','🚀','🔥','🛡️','❤️','⚡','👻','🎯','🌈','🌟','💎','🎲','🧩','🎪','🪄','🏅','🎸'];
                     const emoji = icons[i] || '';
                     return (
-                      <button key={c1+c2} onClick={() => setAvatarUrl(`data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='32' fill='url(%23g)'/><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='${c1}'/><stop offset='100%25' stop-color='${c2}'/></linearGradient></defs><text x='32' y='44' text-anchor='middle' font-size='30' fill='white'>${emoji}</text></svg>`)}`)}
+                      <button key={c1+c2} onClick={() => setAvatarUrl(`data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='32' fill='url(#g)'/><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='${c1}'/><stop offset='100%' stop-color='${c2}'/></linearGradient></defs><text x='32' y='44' text-anchor='middle' font-size='30' fill='white'>${emoji}</text></svg>`)}`)}
                         className="w-full aspect-square rounded-full border-2 border-white/10 hover:border-white/40 transition overflow-hidden flex items-center justify-center text-lg"
                         style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}
                         title={`Avatar ${i + 1}`}
