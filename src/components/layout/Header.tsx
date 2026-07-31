@@ -8,19 +8,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LogoIcon from '@/components/ui/LogoIcon';
 
 const categories = [
+  { name: 'Home', slug: 'all' },
   { name: 'Action', slug: 'action' },
   { name: 'Adventure', slug: 'adventure' },
+  { name: 'Arcade', slug: 'arcade' },
   { name: 'Racing', slug: 'racing' },
-  { name: 'Puzzle', slug: 'puzzle' },
-  { name: 'Shooting', slug: 'shooting' },
   { name: 'Sports', slug: 'sports' },
-];
-
-const SOCIALS = [
-  { icon: '▶', label: 'Discord', href: '#' },
-  { icon: '▶', label: 'YouTube', href: '#' },
-  { icon: '▶', label: 'Facebook', href: '#' },
-  { icon: '✕', label: 'X (Twitter)', href: '#' },
+  { name: 'RPG', slug: 'rpg' },
+  { name: 'Strategy', slug: 'strategy' },
+  { name: 'Horror', slug: 'horror' },
+  { name: 'Puzzle', slug: 'puzzle' },
+  { name: 'Multiplayer', slug: 'multiplayer' },
+  { name: 'Casual', slug: 'casual' },
+  { name: 'Simulation', slug: 'simulation' },
 ];
 
 export default function Header() {
@@ -29,7 +29,6 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [catOpen, setCatOpen] = useState(false);
 
   useEffect(() => {
     if (mobileOpen) {
@@ -42,13 +41,13 @@ export default function Header() {
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { setMobileOpen(false); setCatOpen(false); }
+      if (e.key === 'Escape') { setMobileOpen(false); }
     };
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, []);
 
-  const closeMenu = useCallback(() => { setMobileOpen(false); setCatOpen(false); }, []);
+  const closeMenu = useCallback(() => { setMobileOpen(false); }, []);
 
   const handleSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault();
@@ -104,7 +103,7 @@ export default function Header() {
           <Link href="/" className="px-3 py-2 text-sm font-medium text-blue-400 hover:text-blue-300 rounded-lg transition-colors">
             Home
           </Link>
-          {categories.map((cat) => (
+          {categories.slice(1, 7).map((cat) => (
             <Link
               key={cat.slug}
               href={`/category/${cat.slug}`}
@@ -239,71 +238,55 @@ export default function Header() {
                 </form>
               </div>
 
+              {/* Categories + Login section */}
+              <div className="shrink-0 px-5 py-4 border-b border-white/5 space-y-4">
+                <motion.div variants={itemVariants} initial="hidden" animate="visible" custom={0}>
+                  <div className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold mb-2.5">Game Categories</div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {categories.map((cat) => (
+                      <Link
+                        key={cat.slug}
+                        href={cat.slug === 'all' ? '/' : `/category/${cat.slug}`}
+                        onClick={closeMenu}
+                        className="px-4 py-2.5 min-h-[44px] rounded-xl text-sm font-semibold bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 hover:text-white hover:border-white/25 transition-all inline-flex items-center justify-center"
+                      >
+                        {cat.name}
+                      </Link>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {!user && (
+                  <motion.div variants={itemVariants} initial="hidden" animate="visible" custom={1}>
+                    <Link
+                      href="/login"
+                      onClick={closeMenu}
+                      className="flex items-center justify-center gap-2 w-full py-3.5 min-h-[48px] rounded-xl text-sm font-bold text-white transition-all"
+                      style={{ background: 'linear-gradient(135deg, rgb(var(--brand-500-rgb)), rgb(var(--brand-400-rgb)))', boxShadow: '0 10px 15px -3px rgb(var(--brand-500-rgb) / 0.2)' }}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                      Login / Sign Up
+                    </Link>
+                  </motion.div>
+                )}
+              </div>
+
               {/* Scrollable menu items */}
               <div className="flex-1 overflow-y-auto px-5 py-4 space-y-1">
-                <motion.div custom={0} variants={itemVariants} initial="hidden" animate="visible">
+                <motion.div custom={2} variants={itemVariants} initial="hidden" animate="visible">
                   <Link href="/" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-white hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors">
                     <span className="text-xl">🏠</span> Home
                   </Link>
                 </motion.div>
-                <motion.div custom={1} variants={itemVariants} initial="hidden" animate="visible">
+                <motion.div custom={3} variants={itemVariants} initial="hidden" animate="visible">
                   <Link href="/?sort=popular" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors">
                     <span className="text-xl">🎮</span> All Games
                   </Link>
                 </motion.div>
-                <motion.div custom={2} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/games/trending" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors">
-                    <span className="text-xl">🔥</span> Trending Games
-                  </Link>
-                </motion.div>
-                <motion.div custom={3} variants={itemVariants} initial="hidden" animate="visible">
+                <motion.div custom={4} variants={itemVariants} initial="hidden" animate="visible">
                   <Link href="/?sort=newest" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors">
                     <span className="text-xl">⭐</span> New Games
                   </Link>
-                </motion.div>
-
-                {/* Categories Submenu */}
-                <motion.div custom={4} variants={itemVariants} initial="hidden" animate="visible">
-                  <button
-                    onClick={() => setCatOpen(!catOpen)}
-                    className="flex items-center justify-between w-full px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-indigo-500/15 hover:text-indigo-400 rounded-xl transition-colors"
-                  >
-                    <span className="flex items-center gap-3"><span className="text-xl">🕹</span> Categories</span>
-                    <motion.svg
-                      animate={{ rotate: catOpen ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="w-4 h-4"
-                      fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </motion.svg>
-                  </button>
-                  <AnimatePresence>
-                    {catOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1, transition: { duration: 0.2 } }}
-                        exit={{ height: 0, opacity: 0, transition: { duration: 0.15 } }}
-                        className="overflow-hidden"
-                      >
-                        <div className="pl-6 pr-4 py-1 space-y-0.5">
-                          {categories.map((cat) => (
-                            <Link
-                              key={cat.slug}
-                              href={`/category/${cat.slug}`}
-                              onClick={closeMenu}
-                              className="flex items-center gap-3 px-4 py-2.5 min-h-[44px] text-sm font-medium text-gray-400 hover:bg-indigo-500/10 hover:text-indigo-400 rounded-xl transition-colors"
-                            >
-                              <span className="w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold" style={{ background: `linear-gradient(135deg, ${cat.slug === 'action' ? '#FF6B35' : cat.slug === 'adventure' ? '#00BBF9' : cat.slug === 'racing' ? '#FEE440' : cat.slug === 'puzzle' ? '#FF006E' : cat.slug === 'shooting' ? '#3A86FF' : '#2EC4B6'}` }}>
-                                {cat.name[0]}
-                              </span>
-                              {cat.name}
-                            </Link>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </motion.div>
 
                 <div className="border-t border-white/5 my-2" />
@@ -348,9 +331,9 @@ export default function Header() {
                 </motion.div>
               </div>
 
-              {/* Bottom section: User / Login + Socials */}
-              <div className="shrink-0 border-t border-white/5">
-                {user ? (
+              {/* Bottom section: User info */}
+              {user && (
+                <div className="shrink-0 border-t border-white/5">
                   <div className="px-5 py-3 space-y-2">
                     <div className="flex items-center gap-3 px-3 py-2">
                       <div className="w-9 h-9 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white shrink-0">
@@ -375,39 +358,8 @@ export default function Header() {
                       </button>
                     </div>
                   </div>
-                ) : (
-                  <div className="px-5 py-4">
-                    <Link
-                      href="/login"
-                      onClick={closeMenu}
-                      className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold text-white rounded-xl transition-all min-h-[48px]"
-                      style={{ background: 'linear-gradient(135deg, rgb(var(--brand-500-rgb)), rgb(var(--brand-400-rgb)))', boxShadow: '0 10px 15px -3px rgb(var(--brand-500-rgb) / 0.2)' }}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
-                      Login / Sign Up
-                    </Link>
-                  </div>
-                )}
-
-                {/* Social Icons */}
-                <div className="px-5 pb-5">
-                  <div className="flex items-center justify-center gap-3">
-                    {SOCIALS.map((s) => (
-                      <a
-                        key={s.label}
-                        href={s.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-indigo-500/20 text-gray-400 hover:text-indigo-400 rounded-xl transition-colors text-xs"
-                        aria-label={s.label}
-                      >
-                        {s.icon}
-                      </a>
-                    ))}
-                  </div>
-                  <p className="text-center text-[10px] text-gray-600 mt-3">© 2026 ONLINE GAME. All rights reserved.</p>
                 </div>
-              </div>
+              )}
             </motion.div>
           </motion.div>
         )}
