@@ -154,7 +154,9 @@ async function seed() {
   }
 
   const existingAdmin = await User.findOne({ email: 'admin@onlinegame.com' });
-  if (!existingAdmin) {
+  if (!existingAdmin && !process.env.ADMIN_PASSWORD) {
+    console.warn('ADMIN_PASSWORD not set - skipping admin user seed');
+  } else if (!existingAdmin) {
     await User.create({
       username: 'admin', email: 'admin@onlinegame.com', password: process.env.ADMIN_PASSWORD,
       role: 'superadmin', displayName: 'Admin', coins: 10000, xp: 5000, level: 50,
