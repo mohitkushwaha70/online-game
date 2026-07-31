@@ -63,7 +63,7 @@ function faviconSvg(color: string): string {
 }
 
 function applyCSS(s: SiteSettings) {
-  if (s.siteName) document.title = s.siteName + ' - Free Browser Games';
+  if (s.siteName) document.title = s.siteName;
   if (s.accentColor) {
     const root = document.documentElement;
     const rgb = hexToRgb(s.accentColor);
@@ -75,10 +75,13 @@ function applyCSS(s: SiteSettings) {
     root.style.setProperty('--brand-400-rgb', lighten(s.accentColor, 30));
     root.style.setProperty('--brand-light-rgb', lighten(s.accentColor, 20));
     root.style.setProperty('--brand-dark-rgb', darken(s.accentColor, 20));
-    const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-    (link as HTMLLinkElement).type = 'image/svg+xml';
-    (link as HTMLLinkElement).rel = 'icon';
-    (link as HTMLLinkElement).href = faviconSvg(s.accentColor);
+    let link = document.querySelector("link[rel='icon'][type='image/svg+xml']") as HTMLLinkElement | null;
+    if (!link) {
+      link = document.querySelector("link[rel='icon']") || document.createElement('link');
+      (link as HTMLLinkElement).type = 'image/svg+xml';
+      (link as HTMLLinkElement).rel = 'icon';
+    }
+    link.href = faviconSvg(s.accentColor);
     document.head.appendChild(link);
   }
 }
