@@ -49,7 +49,7 @@ export default function ProfilePage() {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6 lg:p-8 mb-8">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-            <div className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0 bg-gradient-to-r from-brand-500 to-brand-400">
+            <button type="button" className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0 bg-gradient-to-r from-brand-500 to-brand-400 cursor-pointer hover:scale-105 active:scale-95 hover:shadow-lg hover:shadow-brand-500/40 transition-all duration-200">
               {user.avatar ? (
                 <img src={user.avatar} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} className="w-full h-full object-cover" />
               ) : (
@@ -57,7 +57,7 @@ export default function ProfilePage() {
                   {user.username?.[0]?.toUpperCase() || 'U'}
                 </div>
               )}
-            </div>
+            </button>
             <div className="text-center sm:text-left flex-1 min-w-0">
               <h1 className="text-xl sm:text-2xl font-bold text-white truncate">{user.username}</h1>
               <p className="text-sm text-gray-400 truncate">{user.email}</p>
