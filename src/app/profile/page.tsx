@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -15,18 +15,13 @@ interface UserComment {
 }
 
 export default function ProfilePage() {
-  const { user, token, logout, updateUser } = useAuth();
+  const { user, token, logout } = useAuth();
   const router = useRouter();
   const [favorites, setFavorites] = useState<Game[]>([]);
   const [recentGames, setRecentGames] = useState<Game[]>([]);
   const [reviews, setReviews] = useState<UserComment[]>([]);
   const [activeTab, setActiveTab] = useState<'favorites' | 'recent' | 'reviews'>('favorites');
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState('');
-  const [hoverAvatar, setHoverAvatar] = useState('');
-  const [showAvatarModal, setShowAvatarModal] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!user) { router.push('/login'); return; }
@@ -54,18 +49,6 @@ export default function ProfilePage() {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6 lg:p-8 mb-8">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-            <button onClick={() => setShowAvatarModal(true)} className="relative group w-20 h-20 rounded-full overflow-hidden flex-shrink-0 bg-gradient-to-r from-brand-500 to-brand-400">
-              {user.avatar ? (
-                <img src={user.avatar} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-r from-brand-500 to-brand-400 flex items-center justify-center text-3xl font-black text-white">
-                  {user.username?.[0]?.toUpperCase() || 'U'}
-                </div>
-              )}
-              <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-              </div>
-            </button>
             <div className="text-center sm:text-left flex-1 min-w-0">
               <h1 className="text-xl sm:text-2xl font-bold text-white truncate">{user.username}</h1>
               <p className="text-sm text-gray-400 truncate">{user.email}</p>
@@ -96,109 +79,6 @@ export default function ProfilePage() {
             <button onClick={logout} className="px-4 py-2.5 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-sm text-red-400 rounded-lg transition-colors min-h-[44px]">Logout</button>
           </div>
         </div>
-
-        {/* Avatar Modal */}
-        {showAvatarModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => { setShowAvatarModal(false); setHoverAvatar(''); }}>
-            <div className="bg-dark-800 border border-white/10 rounded-2xl p-6 w-full max-w-sm mx-4" onClick={e => e.stopPropagation()}>
-              <h3 className="font-heading text-lg font-bold mb-4">Update Avatar</h3>
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-28 h-28 rounded-full overflow-hidden shadow-lg border border-white/20">
-                  {hoverAvatar || avatarUrl || user.avatar ? (
-                    <img src={hoverAvatar || avatarUrl || user.avatar} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-r from-brand-500 to-brand-400 flex items-center justify-center text-5xl font-black text-white">
-                      {user.username?.[0]?.toUpperCase() || 'U'}
-                    </div>
-                  )}
-                </div>
-                <p className="text-xs text-gray-400 -mt-2">Preview — hover or click to see which one</p>
-                <div className="grid grid-cols-5 gap-2 w-full" onMouseLeave={() => setHoverAvatar('')}>
-                  {[
-                    ['#7c3aed','#3B82F6'], ['#ef4444','#f97316'], ['#10b981','#06b6d4'],
-                    ['#f59e0b','#ef4444'], ['#8b5cf6','#ec4899'], ['#14b8a6','#3b82f6'],
-                    ['#6366f1','#a855f7'], ['#84cc16','#10b981'], ['#ec4899','#8b5cf6'],
-                    ['#06b6d4','#3b82f6'], ['#ff6b6b','#ee5a24'], ['#0abde3','#48dbfb'],
-                    ['#a29bfe','#6c5ce7'], ['#fdcb6e','#e17055'], ['#55efc4','#00b894'],
-                    ['#fab1a0','#e17055'], ['#81ecec','#00cec9'], ['#dfe6e9','#b2bec3'],
-                    ['#ff9ff3','#f368e0'], ['#54a0ff','#2e86de'],
-                  ].map(([c1, c2], i) => {
-                    const icons = ['🎮','🏆','⭐','👑','🚀','🔥','🛡️','❤️','⚡','👻','🎯','🌈','🌟','💎','🎲','🧩','🎪','🪄','🏅','🎸'];
-                    const emoji = icons[i] || '';
-                    const uri = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='32' fill='url(#g)'/><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='${c1}'/><stop offset='100%' stop-color='${c2}'/></linearGradient></defs><text x='32' y='44' text-anchor='middle' font-size='30' fill='white'>${emoji}</text></svg>`)}`;
-                    const selected = avatarUrl === uri;
-                    return (
-                      <button
-                        key={c1+c2}
-                        onClick={() => setAvatarUrl(uri)}
-                        onMouseEnter={() => setHoverAvatar(uri)}
-                        className={`w-full aspect-square rounded-full border-2 overflow-hidden flex items-center justify-center text-lg transition ${selected ? 'border-white scale-110' : 'border-white/10 hover:border-white/40'}`}
-                        style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}
-                        title={`Avatar ${i + 1}`}
-                      >
-                        {emoji}
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="w-full border-t border-white/10 pt-3 space-y-2">
-                  <input
-                    ref={fileRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={e => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      if (file.size > 2 * 1024 * 1024) { alert('Image too large. Max 2MB'); return; }
-                      const reader = new FileReader();
-                      reader.onload = () => setAvatarUrl(reader.result as string);
-                      reader.readAsDataURL(file);
-                    }}
-                  />
-                  <button onClick={() => fileRef.current?.click()} className="w-full py-2 bg-white/10 hover:bg-white/20 text-sm text-white rounded-lg transition">
-                    Upload Image
-                  </button>
-                  <input
-                    type="text"
-                    placeholder="Or paste image URL..."
-                    value={avatarUrl}
-                    onChange={e => setAvatarUrl(e.target.value)}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-brand-500"
-                  />
-                </div>
-                <div className="flex gap-3 w-full">
-                  <button onClick={() => { setShowAvatarModal(false); setAvatarUrl(''); setHoverAvatar(''); }} className="flex-1 py-2.5 bg-white/5 text-white/60 rounded-xl text-sm font-medium hover:bg-white/10 transition">Cancel</button>
-                  <button
-                    onClick={async () => {
-                      if (!avatarUrl || !token) return;
-                      setUploading(true);
-                      try {
-                        const res = await fetch('/api/user/avatar', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                          body: JSON.stringify({ avatar: avatarUrl }),
-                        });
-                        const data = await res.json();
-                        if (data.avatar) {
-                          updateUser({ avatar: data.avatar });
-                          setShowAvatarModal(false);
-                          setAvatarUrl('');
-                          setHoverAvatar('');
-                        }
-                      } catch {}
-                      setUploading(false);
-                    }}
-                    disabled={uploading || !avatarUrl}
-                    className="flex-1 py-2.5 bg-gradient-to-r from-brand-500 to-brand-400 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition disabled:opacity-50"
-                  >
-                    {uploading ? 'Saving...' : 'Save'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         <div className="flex gap-2 mb-6 overflow-x-auto hide-scrollbar">
           <button onClick={() => setActiveTab('favorites')} className={`px-4 sm:px-6 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap min-h-[44px] ${activeTab === 'favorites' ? 'bg-brand-500 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}>
