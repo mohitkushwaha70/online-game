@@ -58,6 +58,24 @@ export default function GameCard({ game, showFav }: GameCardProps) {
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-2xl shadow-black/40 hover:bg-brand-500 hover:border-brand-400 hover:scale-110 transition-all duration-300">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+          </div>
+        </div>
+        <div className="absolute top-2 left-2 flex items-center gap-1.5">
+          {game.isPremium && (
+            <div className="flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-yellow-400 to-amber-500 text-black text-[10px] font-black rounded-full shadow-lg shadow-yellow-500/30">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 6.2L21 9l-5 4.6L17.4 20 12 16.5 6.6 20 8 13.6 3 9l6.6-.8z" /></svg>
+              PREMIUM
+            </div>
+          )}
+          {game.isFeatured && (
+            <div className="px-2 py-0.5 bg-brand-500 text-white text-[10px] font-bold rounded-full">
+              HOT
+            </div>
+          )}
+        </div>
         {showFav && (
           <button onClick={toggleFav} className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/40 hover:bg-black/60 transition z-10">
             <svg className="w-4 h-4" fill={isFav ? '#ef4444' : 'none'} stroke={isFav ? '#ef4444' : '#fff'} strokeWidth={2} viewBox="0 0 24 24">
@@ -78,11 +96,6 @@ export default function GameCard({ game, showFav }: GameCardProps) {
             </span>
           </div>
         </div>
-        {game.isFeatured && (
-          <div className="absolute top-2 left-2 px-2 py-0.5 bg-brand-500 text-white text-[10px] font-bold rounded-full">
-            HOT
-          </div>
-        )}
       </div>
     </Link>
   );

@@ -8,20 +8,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LogoIcon from '@/components/ui/LogoIcon';
 import Avatar from '@/components/ui/Avatar';
 
-const categories = [
-  { name: 'Home', slug: 'all' },
+const DEFAULT_CATEGORIES = [
   { name: 'Action', slug: 'action' },
   { name: 'Adventure', slug: 'adventure' },
   { name: 'Arcade', slug: 'arcade' },
-  { name: 'Racing', slug: 'racing' },
-  { name: 'Sports', slug: 'sports' },
-  { name: 'RPG', slug: 'rpg' },
-  { name: 'Strategy', slug: 'strategy' },
-  { name: 'Horror', slug: 'horror' },
+  { name: 'Board', slug: 'board' },
+  { name: 'Card', slug: 'card' },
+  { name: 'Clicker', slug: 'clicker' },
+  { name: 'Driving', slug: 'driving' },
+  { name: '.io', slug: 'io' },
   { name: 'Puzzle', slug: 'puzzle' },
-  { name: 'Multiplayer', slug: 'multiplayer' },
-  { name: 'Casual', slug: 'casual' },
+  { name: 'Shooting', slug: 'shooting' },
   { name: 'Simulation', slug: 'simulation' },
+  { name: 'Sports', slug: 'sports' },
+  { name: 'Strategy', slug: 'strategy' },
+  { name: 'Thinky', slug: 'thinky' },
+  { name: 'Trivia', slug: 'trivia' },
+  { name: 'Word', slug: 'word' },
 ];
 
 export default function Header() {
@@ -30,6 +33,18 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
+
+  useEffect(() => {
+    fetch('/api/categories')
+      .then(r => r.json())
+      .then(d => {
+        if (Array.isArray(d.categories) && d.categories.length > 0) {
+          setCategories(d.categories.map((c: any) => ({ name: c.name, slug: c.slug })));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (mobileOpen) {
@@ -97,6 +112,9 @@ export default function Header() {
         <Link href="/" className="flex items-center gap-2 min-touch">
           <LogoIcon size={8} />
           <span className="hidden sm:block text-lg font-bold tracking-wider text-gradient">{siteName}</span>
+          <span className="hidden md:inline-flex items-center px-2 py-0.5 text-[9px] font-black tracking-widest uppercase bg-gradient-to-r from-yellow-400 to-amber-500 text-black rounded-full shadow-lg shadow-yellow-500/30">
+            Premium
+          </span>
         </Link>
 
         {/* Desktop nav */}
@@ -104,7 +122,7 @@ export default function Header() {
           <Link href="/" className="px-3 py-2 text-sm font-medium text-brand-400 hover:text-brand-light rounded-lg transition-colors">
             Home
           </Link>
-          {categories.slice(1, 7).map((cat) => (
+          {categories.slice(0, 7).map((cat) => (
             <Link
               key={cat.slug}
               href={`/category/${cat.slug}`}
@@ -245,7 +263,7 @@ export default function Header() {
                     {categories.map((cat) => (
                       <Link
                         key={cat.slug}
-                        href={cat.slug === 'all' ? '/' : `/category/${cat.slug}`}
+                        href={`/category/${cat.slug}`}
                         onClick={closeMenu}
                         className="px-4 py-2.5 min-h-[44px] rounded-xl text-sm font-bold bg-gradient-to-r from-brand-500/30 to-brand-400/10 text-white border border-brand-500/40 hover:from-brand-500/50 hover:to-brand-400/25 hover:border-brand-400/60 transition-all inline-flex items-center justify-center"
                       >

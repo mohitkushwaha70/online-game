@@ -72,14 +72,14 @@ function CategoryContent({ params }: { params: Promise<{ slug: string }> }) {
           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4 flex-wrap">
             <Link href="/" className="hover:text-white transition-colors">Home</Link>
             <span>/</span>
-            <span className="text-white capitalize font-semibold">{slug}</span>
+            <span className="text-white capitalize font-semibold">{category?.name || slug}</span>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-8">
             <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center text-xl sm:text-4xl font-black text-white shrink-0" style={{ background: `linear-gradient(135deg, ${color}, ${color}88)` }}>
               {slug[0].toUpperCase()}
             </div>
             <div className="flex-1">
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white capitalize">{slug} Games</h1>
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white capitalize">{category?.name || slug} Games</h1>
               <p className="text-xs sm:text-base text-gray-400 mt-1 sm:mt-2 max-w-xl">{desc}</p>
               <div className="flex items-center gap-3 sm:gap-4 mt-3 sm:mt-4 text-xs sm:text-sm">
                 <div className="flex items-center gap-1.5">

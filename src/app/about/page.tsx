@@ -8,7 +8,7 @@ export default function AboutPage() {
         <p className="text-gray-400 mb-8">Play the best free online games, instantly in your browser.</p>
         <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-4 text-gray-300 text-sm sm:text-base leading-relaxed">
           <p>Online Game is a free gaming platform where you can play action, racing, puzzle, arcade, and many more games directly in your browser. No downloads, no installs, no waiting — just pick a game and start playing.</p>
-          <p>Our library is curated with handpicked games across 13+ categories, all optimised for desktop and mobile. Whether you have a minute or an hour, there's always a game ready for you.</p>
+          <p>Our library is curated with handpicked games across action, puzzle, racing, sports, strategy and more — all optimised for desktop and mobile. Whether you have a minute or an hour, there's always a game ready for you.</p>
           <p>Create a free account to save your favorites, track recently played games, leave reviews, and unlock coins, XP and levels as you play.</p>
           <p>We're constantly adding new games and improving the experience. Happy gaming!</p>
         </div>

@@ -8,20 +8,23 @@ import { useAuth } from '@/lib/auth-context';
 import { Game } from '@/lib/types';
 import { getRecentGames, addRecentGame, type RecentGameEntry } from '@/lib/recent-local';
 
-const categories = [
-  { name: 'Home', slug: 'all' },
+const DEFAULT_CATEGORIES = [
   { name: 'Action', slug: 'action' },
   { name: 'Adventure', slug: 'adventure' },
   { name: 'Arcade', slug: 'arcade' },
-  { name: 'Racing', slug: 'racing' },
-  { name: 'Sports', slug: 'sports' },
-  { name: 'RPG', slug: 'rpg' },
-  { name: 'Strategy', slug: 'strategy' },
-  { name: 'Horror', slug: 'horror' },
+  { name: 'Board', slug: 'board' },
+  { name: 'Card', slug: 'card' },
+  { name: 'Clicker', slug: 'clicker' },
+  { name: 'Driving', slug: 'driving' },
+  { name: '.io', slug: 'io' },
   { name: 'Puzzle', slug: 'puzzle' },
-  { name: 'Multiplayer', slug: 'multiplayer' },
-  { name: 'Casual', slug: 'casual' },
+  { name: 'Shooting', slug: 'shooting' },
   { name: 'Simulation', slug: 'simulation' },
+  { name: 'Sports', slug: 'sports' },
+  { name: 'Strategy', slug: 'strategy' },
+  { name: 'Thinky', slug: 'thinky' },
+  { name: 'Trivia', slug: 'trivia' },
+  { name: 'Word', slug: 'word' },
 ];
 
 export default function HomePage() {
@@ -31,6 +34,9 @@ export default function HomePage() {
   const [newGames, setNewGames] = useState<Game[]>([]);
   const [popularGames, setPopularGames] = useState<Game[]>([]);
   const [recentGames, setRecentGames] = useState<Game[]>([]);
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
+  const [totalGames, setTotalGames] = useState(55);
+  const [totalCategories, setTotalCategories] = useState(16);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
   const [loading, setLoading] = useState(true);
@@ -46,19 +52,20 @@ export default function HomePage() {
       setSearchQuery(params.get('search') || '');
     }
     const s = params.get('sort');
-    if (s === 'newest' || s === 'popular' || s === 'rating' || s === 'name') {
+    if (s === 'newest' || s === 'popular' || s === 'rating' || s === 'name' || s === 'featured') {
       setSortBy(s);
     }
   }, []);
 
   const fetchGames = useCallback(async (pageNum: number, category: string, sort: string, search: string, append = false) => {
     try {
-      const sortParam = sort === 'newest' ? '-createdAt' : sort === 'popular' ? '-totalPlays' : sort === 'rating' ? '-rating' : sort === 'name' ? 'name' : '-createdAt';
+      const sortParam = sort === 'newest' ? '-createdAt' : sort === 'popular' ? '-totalPlays' : sort === 'rating' ? '-rating' : sort === 'name' ? 'name' : sort === 'featured' ? '-createdAt' : '-createdAt';
       const params = new URLSearchParams({
         page: pageNum.toString(),
         limit: '20',
         sort: sortParam,
       });
+      if (sort === 'featured') params.set('isFeatured', 'true');
       if (category !== 'all') params.set('category', category);
       if (search) params.set('search', search);
 
@@ -96,6 +103,19 @@ export default function HomePage() {
       } catch (error) {
         console.error('Failed to fetch sections:', error);
       }
+      fetch('/api/categories')
+        .then(r => r.json())
+        .then(d => {
+          if (Array.isArray(d.categories) && d.categories.length > 0) {
+            setCategories(d.categories.map((c: any) => ({ name: c.name, slug: c.slug })));
+            setTotalCategories(d.categories.length);
+          }
+        })
+        .catch(() => {});
+      fetch('/api/games?limit=1')
+        .then(r => r.json())
+        .then(d => { if (d.total) setTotalGames(d.total); })
+        .catch(() => {});
       setLoading(false);
     };
     fetchSections();
@@ -193,7 +213,7 @@ export default function HomePage() {
             <span className="text-white"> for Free</span>
           </h1>
           <p className="text-base sm:text-lg text-gray-400 max-w-xl mx-auto mb-10 px-4">
-            100+ handpicked browser games. Action, racing, puzzles — play anything, anywhere, instantly.
+            Handpicked premium browser games. Action, racing, puzzles — play anything, anywhere, instantly.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 px-4">
             <Link href="#games" className="group relative px-8 py-3.5 text-white font-bold rounded-xl transition-all text-center min-h-[48px] flex items-center justify-center text-sm sm:text-base hover:scale-105" style={{ background: 'linear-gradient(135deg, rgb(var(--brand-500-rgb)), rgb(var(--brand-500-rgb) / 0.85))', boxShadow: '0 10px 15px -3px rgb(var(--brand-500-rgb) / 0.25)' }}>
@@ -212,12 +232,12 @@ export default function HomePage() {
           {/* Stats bar - compact on mobile */}
           <div className="flex items-center justify-center gap-4 sm:gap-10 mt-10 sm:mt-12 text-center">
             <div>
-              <div className="text-base sm:text-2xl font-black text-white">55+</div>
+              <div className="text-base sm:text-2xl font-black text-white">{totalGames}+</div>
               <div className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Games</div>
             </div>
             <div className="w-px h-6 sm:h-8 bg-white/10" />
             <div>
-              <div className="text-base sm:text-2xl font-black text-white">16</div>
+              <div className="text-base sm:text-2xl font-black text-white">{totalCategories}</div>
               <div className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Categories</div>
             </div>
             <div className="w-px h-6 sm:h-8 bg-white/10" />
@@ -249,6 +269,16 @@ export default function HomePage() {
         {/* Game Categories */}
         <div className="mb-6">
           <div className="flex gap-2 sm:gap-3 overflow-x-auto sm:overflow-visible sm:flex-wrap pb-2 sm:pb-0 hide-scrollbar">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`flex-none sm:flex-1 sm:min-w-[110px] px-4 sm:px-5 py-2.5 sm:py-3 min-h-[44px] rounded-full text-xs sm:text-sm font-bold transition-all duration-300 border inline-flex items-center justify-center ${
+                selectedCategory === 'all'
+                  ? 'bg-gradient-to-r from-brand-500 to-brand-400 text-white border-brand-300 shadow-lg shadow-brand-500/30 scale-[1.04]'
+                  : 'bg-gradient-to-r from-brand-500/20 to-brand-400/10 text-brand-200 border-brand-500/30 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.03] hover:shadow-lg hover:shadow-brand-500/20'
+              }`}
+            >
+              All
+            </button>
             {categories.map((cat) => (
               <button
                 key={cat.slug}
@@ -274,6 +304,7 @@ export default function HomePage() {
               className="w-full sm:w-auto px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-gray-300 focus:outline-none focus:border-brand-500 min-h-[44px] appearance-none"
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '20px' }}
             >
+              <option value="featured">Featured</option>
               <option value="newest">Newest First</option>
               <option value="popular">Most Popular</option>
               <option value="rating">Top Rated</option>

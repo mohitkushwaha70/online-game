@@ -98,6 +98,7 @@ export interface IUser extends Document {
   watchlist: mongoose.Types.ObjectId[];
   lastLogin: Date;
   loginCount: number;
+  lastDailyReward: Date;
   comparePassword(pw: string): Promise<boolean>;
 }
 
@@ -123,6 +124,7 @@ const UserSchema = new Schema<IUser>({
   watchlist: [{ type: Schema.Types.ObjectId, ref: 'Game' }],
   lastLogin: Date,
   loginCount: { type: Number, default: 0 },
+  lastDailyReward: { type: Date, default: null },
 }, { timestamps: true });
 
 UserSchema.pre('save', async function (next) {

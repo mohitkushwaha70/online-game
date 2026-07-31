@@ -1,33 +1,84 @@
 'use client';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import LogoIcon from '@/components/ui/LogoIcon';
+
+const DEFAULT_CATEGORIES = [
+  { name: 'Action', slug: 'action' },
+  { name: 'Adventure', slug: 'adventure' },
+  { name: 'Arcade', slug: 'arcade' },
+  { name: 'Board', slug: 'board' },
+  { name: 'Card', slug: 'card' },
+  { name: 'Clicker', slug: 'clicker' },
+  { name: 'Driving', slug: 'driving' },
+  { name: '.io', slug: 'io' },
+  { name: 'Puzzle', slug: 'puzzle' },
+  { name: 'Shooting', slug: 'shooting' },
+  { name: 'Simulation', slug: 'simulation' },
+  { name: 'Sports', slug: 'sports' },
+  { name: 'Strategy', slug: 'strategy' },
+  { name: 'Thinky', slug: 'thinky' },
+  { name: 'Trivia', slug: 'trivia' },
+  { name: 'Word', slug: 'word' },
+];
 
 const footerLinks = {
   'Quick Links': [
     { name: 'Home', href: '/' },
-    { name: 'All Games', href: '/' },
+    { name: 'All Games', href: '/#games' },
     { name: 'Recently Played', href: '/recently-played' },
-  ],
-  Categories: [
-    { name: 'Action', href: '/category/action' },
-    { name: 'Adventure', href: '/category/adventure' },
-    { name: 'Racing', href: '/category/racing' },
-    { name: 'Puzzle', href: '/category/puzzle' },
-    { name: 'Shooting', href: '/category/shooting' },
-    { name: 'Sports', href: '/category/sports' },
+    { name: 'Favorites', href: '/favorites' },
   ],
   Account: [
     { name: 'Login', href: '/login' },
     { name: 'Profile', href: '/profile' },
-    { name: 'Favorites', href: '/favorites' },
+    { name: 'About Us', href: '/about' },
+    { name: 'Contact', href: '/contact' },
   ],
 };
 
 export default function Footer() {
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
+
+  useEffect(() => {
+    fetch('/api/categories')
+      .then(r => r.json())
+      .then(d => {
+        if (Array.isArray(d.categories) && d.categories.length > 0) {
+          setCategories(d.categories.slice(0, 8).map((c: any) => ({ name: c.name, slug: c.slug })));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <footer className="bg-dark-950 border-t border-white/5 mt-auto">
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <LogoIcon size={8} />
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold tracking-wider text-gradient">ONLINE GAME</span>
+                <span className="inline-flex items-center px-2 py-0.5 text-[9px] font-black tracking-widest uppercase bg-gradient-to-r from-yellow-400 to-amber-500 text-black rounded-full shadow-lg shadow-yellow-500/30">
+                  Premium
+                </span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 leading-relaxed">Handpicked premium browser games. Play anything, anywhere, instantly — free forever.</p>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-white tracking-wider uppercase mb-4">Categories</h3>
+            <ul className="space-y-2">
+              {categories.map((cat) => (
+                <li key={cat.slug}>
+                  <Link href={`/category/${cat.slug}`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                    {cat.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
               <h3 className="text-sm font-bold text-white tracking-wider uppercase mb-4">{title}</h3>
@@ -45,11 +96,8 @@ export default function Footer() {
         </div>
         <div className="mt-8 pt-8 border-t border-white/5">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <LogoIcon size={8} />
-              <span className="text-lg font-bold tracking-wider text-gradient">ONLINE GAME</span>
-            </div>
             <p className="text-xs text-gray-500">© {new Date().getFullYear()} ONLINE GAME. All rights reserved.</p>
+            <p className="text-xs text-gray-600">Made with <span className="text-brand-400">♥</span> for gamers worldwide.</p>
           </div>
         </div>
       </div>
