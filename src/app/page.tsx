@@ -21,7 +21,13 @@ export default function HomePage() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [bodySearch, setBodySearch] = useState('');
   const observerRef = useRef<HTMLDivElement>(null);
+
+  const handleBodySearch = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchQuery(bodySearch.trim());
+  }, [bodySearch]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -220,6 +226,23 @@ export default function HomePage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 pb-12 pt-6">
+        {/* Search Bar */}
+        <form onSubmit={handleBodySearch} className="relative mb-8">
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            value={bodySearch}
+            onChange={(e) => setBodySearch(e.target.value)}
+            placeholder="Search games..."
+            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-3.5 text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all min-h-[52px]"
+          />
+          <button type="submit" className="absolute right-1.5 top-1/2 -translate-y-1/2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:scale-105" style={{ background: 'linear-gradient(135deg, rgb(var(--brand-500-rgb)), rgb(var(--brand-400-rgb)))' }}>
+            Search
+          </button>
+        </form>
+
         {/* Carousels */}
         {showCarousels && !loading && (
           <div className="space-y-10 mb-10">
