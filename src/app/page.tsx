@@ -260,10 +260,10 @@ export default function HomePage() {
               <button
                 key={cat.slug}
                 onClick={() => setSelectedCategory(cat.slug)}
-                className={`flex-none sm:flex-1 sm:min-w-[110px] px-4 sm:px-5 py-2.5 sm:py-3 min-h-[44px] rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 border inline-flex items-center justify-center ${
+                className={`flex-none sm:flex-1 sm:min-w-[110px] px-4 sm:px-5 py-2.5 sm:py-3 min-h-[44px] rounded-full text-xs sm:text-sm font-bold transition-all duration-300 border inline-flex items-center justify-center ${
                   selectedCategory === cat.slug
-                    ? 'bg-red-600 text-white border-red-500 shadow-lg shadow-red-500/25 scale-[1.04]'
-                    : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 hover:text-white hover:border-white/25 hover:scale-[1.03] hover:shadow-lg hover:shadow-black/20'
+                    ? 'bg-gradient-to-r from-brand-500 to-brand-400 text-white border-brand-300 shadow-lg shadow-brand-500/30 scale-[1.04]'
+                    : 'bg-gradient-to-r from-brand-500/20 to-brand-400/10 text-brand-200 border-brand-500/30 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.03] hover:shadow-lg hover:shadow-brand-500/20'
                 }`}
               >
                 {cat.name}

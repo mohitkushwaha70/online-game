@@ -247,7 +247,7 @@ export default function Header() {
                         key={cat.slug}
                         href={cat.slug === 'all' ? '/' : `/category/${cat.slug}`}
                         onClick={closeMenu}
-                        className="px-4 py-2.5 min-h-[44px] rounded-xl text-sm font-semibold bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 hover:text-white hover:border-white/25 transition-all inline-flex items-center justify-center"
+                        className="px-4 py-2.5 min-h-[44px] rounded-xl text-sm font-bold bg-gradient-to-r from-brand-500/30 to-brand-400/10 text-white border border-brand-500/40 hover:from-brand-500/50 hover:to-brand-400/25 hover:border-brand-400/60 transition-all inline-flex items-center justify-center"
                       >
                         {cat.name}
                       </Link>
