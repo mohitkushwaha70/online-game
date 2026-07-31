@@ -8,6 +8,22 @@ import { useAuth } from '@/lib/auth-context';
 import { Game } from '@/lib/types';
 import { getRecentGames, addRecentGame, type RecentGameEntry } from '@/lib/recent-local';
 
+const categories = [
+  { name: 'Home', slug: 'all' },
+  { name: 'Action', slug: 'action' },
+  { name: 'Adventure', slug: 'adventure' },
+  { name: 'Arcade', slug: 'arcade' },
+  { name: 'Racing', slug: 'racing' },
+  { name: 'Sports', slug: 'sports' },
+  { name: 'RPG', slug: 'rpg' },
+  { name: 'Strategy', slug: 'strategy' },
+  { name: 'Horror', slug: 'horror' },
+  { name: 'Puzzle', slug: 'puzzle' },
+  { name: 'Multiplayer', slug: 'multiplayer' },
+  { name: 'Casual', slug: 'casual' },
+  { name: 'Simulation', slug: 'simulation' },
+];
+
 export default function HomePage() {
   const { user, token } = useAuth();
   const [games, setGames] = useState<Game[]>([]);
@@ -15,6 +31,7 @@ export default function HomePage() {
   const [newGames, setNewGames] = useState<Game[]>([]);
   const [popularGames, setPopularGames] = useState<Game[]>([]);
   const [recentGames, setRecentGames] = useState<Game[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -116,14 +133,14 @@ export default function HomePage() {
   useEffect(() => {
     setPage(1);
     setHasMore(true);
-    fetchGames(1, 'all', sortBy, searchQuery);
-  }, [sortBy, searchQuery, fetchGames]);
+    fetchGames(1, selectedCategory, sortBy, searchQuery);
+  }, [selectedCategory, sortBy, searchQuery, fetchGames]);
 
   useEffect(() => {
     if (page > 1) {
-      fetchGames(page, 'all', sortBy, searchQuery, true);
+      fetchGames(page, selectedCategory, sortBy, searchQuery, true);
     }
-  }, [page, sortBy, searchQuery, fetchGames]);
+  }, [page, selectedCategory, sortBy, searchQuery, fetchGames]);
 
   useEffect(() => {
     if (loading || !hasMore) return;
@@ -141,7 +158,7 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, [loading, hasMore, loadingMore]);
 
-  const showCarousels = !searchQuery;
+  const showCarousels = !searchQuery && selectedCategory === 'all';
 
   return (
     <div className="min-h-screen bg-dark-950">
@@ -226,6 +243,22 @@ export default function HomePage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 pb-12 pt-6">
+        {/* Carousels */}
+        {showCarousels && !loading && (
+          <div className="space-y-10 mb-10">
+            <GameCarousel title="Continue Watching" games={recentGames.length > 0 ? recentGames : popularGames} viewAllLink="/recently-played" />
+            {featuredGames.length > 0 && (
+              <GameCarousel title="Featured Games" games={featuredGames} viewAllLink="/?sort=featured" />
+            )}
+            {newGames.length > 0 && (
+              <GameCarousel title="New Games" games={newGames} viewAllLink="/?sort=newest" />
+            )}
+            {popularGames.length > 0 && (
+              <GameCarousel title="Most Popular" games={popularGames} viewAllLink="/?sort=popular" />
+            )}
+          </div>
+        )}
+
         {/* Search Bar */}
         <form onSubmit={handleBodySearch} className="relative mb-8">
           <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,19 +276,38 @@ export default function HomePage() {
           </button>
         </form>
 
-        {/* Carousels */}
-        {showCarousels && !loading && (
-          <div className="space-y-10 mb-10">
-            <GameCarousel title="Continue Watching" games={recentGames.length > 0 ? recentGames : popularGames} viewAllLink="/recently-played" />
-            {featuredGames.length > 0 && (
-              <GameCarousel title="Featured Games" games={featuredGames} viewAllLink="/?sort=featured" />
-            )}
-            {newGames.length > 0 && (
-              <GameCarousel title="New Games" games={newGames} viewAllLink="/?sort=newest" />
-            )}
-            {popularGames.length > 0 && (
-              <GameCarousel title="Most Popular" games={popularGames} viewAllLink="/?sort=popular" />
-            )}
+        {/* Game Categories */}
+        <div className="mb-6">
+          <div className="flex gap-2 sm:gap-3 overflow-x-auto sm:overflow-visible sm:flex-wrap pb-2 sm:pb-0 hide-scrollbar">
+            {categories.map((cat) => (
+              <button
+                key={cat.slug}
+                onClick={() => setSelectedCategory(cat.slug)}
+                className={`flex-none sm:flex-1 sm:min-w-[110px] px-4 sm:px-5 py-2.5 sm:py-3 min-h-[44px] rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 border inline-flex items-center justify-center ${
+                  selectedCategory === cat.slug
+                    ? 'bg-red-600 text-white border-red-500 shadow-lg shadow-red-500/25 scale-[1.04]'
+                    : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 hover:text-white hover:border-white/25 hover:scale-[1.03] hover:shadow-lg hover:shadow-black/20'
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Login / Sign Up */}
+        {!user && (
+          <div className="mb-8 flex justify-center">
+            <Link
+              href="/login"
+              className="w-full sm:w-auto px-10 py-3.5 min-h-[52px] rounded-2xl text-base font-bold text-white flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              style={{ background: 'linear-gradient(135deg, rgb(var(--brand-500-rgb)), rgb(var(--brand-400-rgb)))', boxShadow: '0 10px 15px -3px rgb(var(--brand-500-rgb) / 0.25)' }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+              </svg>
+              Login / Sign Up
+            </Link>
           </div>
         )}
 
