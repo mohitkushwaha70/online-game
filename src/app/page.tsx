@@ -187,13 +187,6 @@ export default function HomePage() {
 
         {/* Content */}
         <div className="relative max-w-7xl mx-auto px-4 py-16 sm:py-20 lg:py-24 text-center w-full">
-          <div className="inline-flex items-center gap-2 mb-6 px-5 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full" style={{ boxShadow: '0 10px 15px -3px rgb(var(--brand-500-rgb) / 0.05)' }}>
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
-            </span>
-            <span className="text-xs sm:text-sm font-medium text-gray-300">Play instantly — No download required</span>
-          </div>
           <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-6 leading-[1.1]">
             Play <span className="bg-clip-text text-transparent bg-[length:200%_auto] animate-[shimmer_3s_linear_infinite]" style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--brand-400-rgb)), rgb(var(--brand-500-rgb)), rgb(var(--brand-400-rgb)))' }}>Premium Games</span>
             <br className="hidden sm:block" />
