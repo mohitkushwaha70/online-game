@@ -295,22 +295,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Login / Sign Up */}
-        {!user && (
-          <div className="mb-8 flex justify-center">
-            <Link
-              href="/login"
-              className="w-full sm:w-auto px-10 py-3.5 min-h-[52px] rounded-2xl text-base font-bold text-white flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg, rgb(var(--brand-500-rgb)), rgb(var(--brand-400-rgb)))', boxShadow: '0 10px 15px -3px rgb(var(--brand-500-rgb) / 0.25)' }}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-              </svg>
-              Login / Sign Up
-            </Link>
-          </div>
-        )}
-
         {/* Filters - sort only */}
         <div id="games" className="mb-8 scroll-mt-20">
           <div className="flex flex-col sm:flex-row sm:justify-end gap-2">
