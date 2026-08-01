@@ -53,16 +53,20 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!authReady) return;
-    if (page === 'dashboard') api('/api/admin/dashboard').then(d => d && setDashData(d));
-    if (page === 'analytics') api('/api/admin/dashboard').then(d => d && setDashData(d));
-    if (page === 'games') api('/api/admin/games').then(d => d && setGames(d.games || []));
-    if (page === 'categories') api('/api/admin/categories').then(d => d && setCategories(d.categories || []));
-    if (page === 'users') api('/api/admin/users').then(d => d && setUsers(d.users || []));
-    if (page === 'banners') api('/api/admin/banners').then(d => d && setBanners(d.banners || []));
-    if (page === 'coupons') api('/api/admin/coupons').then(d => d && setCoupons(d.coupons || []));
-    if (page === 'notifications') api('/api/admin/notifications').then(d => d && setNotifications(d.notifications || []));
-    if (page === 'settings') api('/api/admin/settings').then(d => d && setSettings(d.settings));
-    if (page === 'database') api('/api/admin/database').then(d => d && setDbData(d.collections));
+    const load = () => {
+      if (page === 'dashboard' || page === 'analytics') api('/api/admin/dashboard').then(d => d && setDashData(d));
+      if (page === 'games') api('/api/admin/games').then(d => d && setGames(d.games || []));
+      if (page === 'categories') api('/api/admin/categories').then(d => d && setCategories(d.categories || []));
+      if (page === 'users') api('/api/admin/users').then(d => d && setUsers(d.users || []));
+      if (page === 'banners') api('/api/admin/banners').then(d => d && setBanners(d.banners || []));
+      if (page === 'coupons') api('/api/admin/coupons').then(d => d && setCoupons(d.coupons || []));
+      if (page === 'notifications') api('/api/admin/notifications').then(d => d && setNotifications(d.notifications || []));
+      if (page === 'settings') api('/api/admin/settings').then(d => d && setSettings(d.settings));
+      if (page === 'database') api('/api/admin/database').then(d => d && setDbData(d.collections));
+    };
+    load();
+    const id = setInterval(load, 10000);
+    return () => clearInterval(id);
   }, [page, authReady, api]);
 
   if (!authReady) return <div className="min-h-screen bg-dark-950 flex items-center justify-center"><div className="skeleton w-48 h-8" /></div>;
@@ -163,6 +167,14 @@ export default function AdminPage() {
         </header>
 
         <div className="p-3 sm:p-4 lg:p-6">
+          {/* Live indicator */}
+          <div className="flex items-center gap-2 text-[10px] lg:text-xs text-white/30 mb-4">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+            </span>
+            Live data — auto-refreshes every 10 seconds
+          </div>
           {/* Dashboard */}
           {page === 'dashboard' && dashData && (
             <>
