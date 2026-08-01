@@ -67,11 +67,9 @@ export default function Header() {
 
   const handleSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      window.location.href = `/?search=${encodeURIComponent(searchQuery.trim())}`;
-      setSearchOpen(false);
-      setSearchQuery('');
-    }
+    window.location.href = '/category';
+    setSearchOpen(false);
+    setSearchQuery('');
   }, [searchQuery]);
 
   const overlayVariants = {
@@ -112,9 +110,6 @@ export default function Header() {
         <Link href="/" className="flex items-center gap-2 min-touch">
           <LogoIcon size={8} />
           <span className="hidden sm:block text-lg font-bold tracking-wider text-gradient">{siteName}</span>
-          <span className="hidden md:inline-flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 text-black shadow-lg shadow-yellow-500/30">
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6.5l4.6 3.9L12 4.5l4.4 5.9L21 6.5 19.5 18h-15L3 6.5zM4.5 20h15v1.5h-15V20z" /></svg>
-          </span>
         </Link>
 
         {/* Desktop nav */}
@@ -188,7 +183,7 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Premium Full-Screen Mobile Nav */}
+      {/* Mobile Nav */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -234,20 +229,20 @@ export default function Header() {
                     >
                       {siteName}
                     </div>
-                    <div className="text-[10px] text-gray-500 uppercase tracking-widest">Ultimate Gaming</div>
+                    <div className="text-[10px] text-gray-500 uppercase tracking-widest">Gaming</div>
                   </div>
                 </Link>
               </div>
 
               {/* Search bar */}
               <div className="shrink-0 px-5 py-3 border-b border-white/5">
-                <form onSubmit={(e) => { e.preventDefault(); if (searchQuery.trim()) { window.location.href = `/?search=${encodeURIComponent(searchQuery.trim())}`; closeMenu(); } }} className="relative">
+                <form onSubmit={(e) => { e.preventDefault(); window.location.href = '/category'; closeMenu(); }} className="relative">
                   <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                   <input
                     type="text"
-                    placeholder="Search games..."
+                    placeholder="Browse categories..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-500 min-h-[48px]"
@@ -296,13 +291,13 @@ export default function Header() {
                   </Link>
                 </motion.div>
                 <motion.div custom={3} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/?sort=popular" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
-                    <span className="text-xl">🎮</span> All Games
+                  <Link href="/category" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
+                    <span className="text-xl">🎮</span> Categories
                   </Link>
                 </motion.div>
                 <motion.div custom={4} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/?sort=newest" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
-                    <span className="text-xl">⭐</span> New Games
+                  <Link href="/about" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
+                    <span className="text-xl">📄</span> About
                   </Link>
                 </motion.div>
 
@@ -332,16 +327,11 @@ export default function Header() {
                   </Link>
                 </motion.div>
                 <motion.div custom={9} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/about" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
-                    <span className="text-xl">📄</span> About
-                  </Link>
-                </motion.div>
-                <motion.div custom={10} variants={itemVariants} initial="hidden" animate="visible">
                   <Link href="/privacy" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
                     <span className="text-xl">🔒</span> Privacy Policy
                   </Link>
                 </motion.div>
-                <motion.div custom={11} variants={itemVariants} initial="hidden" animate="visible">
+                <motion.div custom={10} variants={itemVariants} initial="hidden" animate="visible">
                   <Link href="/terms" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
                     <span className="text-xl">📜</span> Terms of Service
                   </Link>

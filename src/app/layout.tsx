@@ -44,22 +44,31 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: `(function(){
   try {
     var raw = localStorage.getItem('site-settings');
-    if (!raw) return;
-    var s = JSON.parse(raw);
-    var accent = s.accentColor;
-    if (!accent) return;
+    var accent = null;
+    if (raw) { var s = JSON.parse(raw); accent = s.accentColor; }
     function hex2rgb(hex){ var h = hex.replace('#',''); return parseInt(h.slice(0,2),16)+' '+parseInt(h.slice(2,4),16)+' '+parseInt(h.slice(4,6),16); }
     function lighten(hex,amt){ var h = hex.replace('#',''); return Math.min(255,parseInt(h.slice(0,2),16)+amt)+' '+Math.min(255,parseInt(h.slice(2,4),16)+amt)+' '+Math.min(255,parseInt(h.slice(4,6),16)+amt); }
     function darken(hex,amt){ var h = hex.replace('#',''); return Math.max(0,parseInt(h.slice(0,2),16)-amt)+' '+Math.max(0,parseInt(h.slice(2,4),16)-amt)+' '+Math.max(0,parseInt(h.slice(4,6),16)-amt); }
+    function hexToHex(hex,amt){ var h=hex.replace('#',''); return '#'+Math.min(255,parseInt(h.slice(0,2),16)+amt).toString(16).padStart(2,'0')+Math.min(255,parseInt(h.slice(2,4),16)+amt).toString(16).padStart(2,'0')+Math.min(255,parseInt(h.slice(4,6),16)+amt).toString(16).padStart(2,'0'); }
     var root = document.documentElement;
-    var rgb = hex2rgb(accent);
-    root.style.setProperty('--accent-color', accent);
-    root.style.setProperty('--accent-from', accent);
-    root.style.setProperty('--brand-rgb', rgb);
-    root.style.setProperty('--brand-500-rgb', rgb);
-    root.style.setProperty('--brand-400-rgb', lighten(accent,30));
-    root.style.setProperty('--brand-light-rgb', lighten(accent,20));
-    root.style.setProperty('--brand-dark-rgb', darken(accent,20));
+    if (accent) {
+      var rgb = hex2rgb(accent);
+      root.style.setProperty('--accent-color', accent);
+      root.style.setProperty('--accent-from', accent);
+      root.style.setProperty('--brand-rgb', rgb);
+      root.style.setProperty('--brand-500-rgb', rgb);
+      root.style.setProperty('--brand-400-rgb', lighten(accent,30));
+      root.style.setProperty('--brand-light-rgb', lighten(accent,20));
+      root.style.setProperty('--brand-dark-rgb', darken(accent,20));
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="'+accent+'"/><stop offset="100%" stop-color="'+hexToHex(accent,60)+'"/></linearGradient></defs><rect width="24" height="24" rx="5" fill="url(#g)"/><path fill="white" d="M21.58 16.09l-1.09-7.66C20.21 6.46 18.52 5 16.53 5H7.47C5.48 5 3.79 6.46 3.51 8.43l-1.09 7.66C2.2 17.63 3.39 19 4.94 19c.68 0 1.32-.34 1.68-.92L8 15h8l1.38 3.08c.36.58 1 .92 1.68.92 1.55 0 2.74-1.37 2.52-2.91zM9 10H7V8h2v2zm5 0h-2V8h2v2z"/></svg>';
+      var href = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+      var links = document.querySelectorAll('link[rel~="icon"]');
+      if (links.length) { links.forEach(function(l){ l.setAttribute('href', href); }); }
+      else {
+        var link = document.createElement('link'); link.rel = 'icon'; link.href = href;
+        document.head.appendChild(link);
+      }
+    }
   } catch(e){}
 })();` }} />
         <AuthProvider>

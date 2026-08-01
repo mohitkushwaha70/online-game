@@ -64,11 +64,6 @@ export default function GameCard({ game, showFav }: GameCardProps) {
           </div>
         </div>
         <div className="absolute top-2 left-2 flex items-center gap-1.5">
-          {game.isPremium && (
-            <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-br from-yellow-400 to-amber-500 text-black rounded-full shadow-lg shadow-yellow-500/40">
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6.5l4.6 3.9L12 4.5l4.4 5.9L21 6.5 19.5 18h-15L3 6.5zM4.5 20h15v1.5h-15V20z" /></svg>
-            </div>
-          )}
           {game.isFeatured && (
             <div className="px-2 py-0.5 bg-brand-500 text-white text-[10px] font-bold rounded-full">
               HOT
