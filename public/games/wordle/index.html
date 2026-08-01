@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Wordle</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#0f1019;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;overflow:hidden;padding:10px}
+h1{font-size:clamp(24px,6vw,38px);font-weight:800;background:linear-gradient(135deg,#6842FF,#8660FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+#grid{display:grid;grid-template-rows:repeat(6,1fr);gap:5px;width:min(86vw,300px)}
+.row{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.tile{aspect-ratio:1;background:#1c1e31;border:2px solid rgba(255,255,255,.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:clamp(18px,6vw,30px);font-weight:800;text-transform:uppercase}
+.tile.g{background:#22a06b;border-color:#22a06b;color:#fff}
+.tile.y{background:#c9a227;border-color:#c9a227;color:#fff}
+.tile.x{background:#3a3f52;border-color:#3a3f52;color:#fff}
+.tile.wrong{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+#keyboard{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;width:min(96vw,440px);margin-top:14px}
+.key{height:34px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;user-select:none;text-transform:uppercase}
+.key.g{background:#22a06b}.key.y{background:#c9a227}.key.x{background:#3a3f52}.key:hover{background:rgba(104,66,255,.4)}
+.key.wide{grid-column:span 2}
+button{padding:9px 20px;font-size:13px;font-weight:700;border:none;border-radius:12px;background:linear-gradient(135deg,#6842FF,#8660FF);color:#fff;cursor:pointer;box-shadow:0 10px 25px rgba(104,66,255,.35);margin-top:12px}
+button:hover{transform:translateY(-2px)}
+#msg{font-size:14px;color:#ffd94d;min-height:20px;margin-top:8px}
+</style>
+</head>
+<body>
+<h1>Wordle</h1>
+<div id="msg"></div>
+<div id="grid"></div>
+<div id="keyboard"></div>
+<button onclick="newGame()">New Word</button>
+<script>
+var WORDS=["PRIDE","BRAVE","SHINE","MAGIC","SMART","DREAM","FRESH","HAPPY","JUMPY","QUICK","STORM","CRISP","TRUST","PEACH","OLIVE","RADIO","TIGER","WATCH","APPLE","BEACH","CHAIR","DANCE","EAGLE","FLAME","GRAPE","HOUSE","IVORY","JELLY","KNIFE","LEMON","MOUSE","NIGHT","OCEAN","PIANO","QUEEN","RIVER","SUNNY","TULIP","UNCLE","VIOLA","WINDY","YACHT","ZEBRA","PLUMB","FORTY","GLOVE","HONEY","ISLAND","JUMBO","KOALA"];
+var answer,guesses=0,cur=0,done=false;
+var gridEl=document.getElementById('grid'),kb=document.getElementById('keyboard');
+function newGame(){answer=WORDS[Math.floor(Math.random()*WORDS.length)];guesses=0;cur=0;done=false;document.getElementById('msg').textContent='';render();buildKeys()}
+function buildKeys(){var states={}
+  for(var g=0;g<guesses;g++){var w=guessOf(g);for(var k=0;k<5;k++){var l=w[k];var st=stateOf(w,k);if(st==='g')states[l]='g';else if(st==='y'&&states[l]!=='g')states[l]='y';else if(!states[l])states[l]='x'}}
+  var html='<div class="key wide" data-k="back">⌫</div>';
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(function(L){html+='<div class="key '+(states[L]||'')+'" data-k="'+L+'">'+L+'</div>'});
+  html+='<div class="key wide" data-k="enter">↵</div>';
+  kb.innerHTML=html}
+function stateOf(w,i){var l=w[i];if(answer[i]===l)return 'g';
+  var count={},used={};for(var j=0;j<5;j++){if(answer[j]===l)count[l]=(count[l]||0)+1}
+  for(var j=0;j<5;j++){if(w[j]===l&&answer[j]!==l)used[l]=(used[l]||0)+1}
+  var gcount=0;for(var j=0;j<5;j++)if(answer[j]===l&&w[j]===l)gcount++;
+  return (gcount+used[l])<=count[l]?'y':'x'}
+function guessOf(g){var row=[];for(var i=0;i<5;i++){var t=gridEl.children[g].children[i];row.push(t.textContent)}return row.join('')}
+function render(){var html='';for(var r=0;r<6;r++){html+='<div class="row">';for(var c=0;c<5;c++)html+='<div class="tile"></div>';html+='</div>'}
+  gridEl.innerHTML=html;
+  for(var g=0;g<guesses;g++){var w=guessOf(g);for(var i=0;i<5;i++){var t=gridEl.children[g].children[i];t.textContent=w[i];t.classList.add(stateOf(w,i))}}
+  for(var i=0;i<cur;i++)gridEl.children[guesses].children[i].textContent=guessOf(guesses)[i]||currentGuess()[i]}
+function currentGuess(){var row=[];for(var i=0;i<5;i++){var t=gridEl.children[guesses].children[i];row.push(t.textContent||'')}return row.join('')}
+function type(L){if(done||guesses>=6)return;
+  if(L==='back'){if(cur>0){cur--;gridEl.children[guesses].children[cur].textContent=''}}
+  else if(L==='enter'){var w=currentGuess();if(cur<5){flash('Not enough letters');return}
+    if(!WORDS.includes(w)){flash('Not in word list');return}
+    var letters={};for(var i=0;i<5;i++){var t=gridEl.children[guesses].children[i];var st=stateOf(w,i);t.classList.add(st);letters[w[i]]=st}
+    if(w===answer){done=true;flash('You Win! 🎉  — '+answer)}
+    else if(guesses>=5){done=true;flash('Game Over — it was '+answer)}
+    else flash('');
+    guesses++;cur=0;buildKeys();render()}
+  else{if(cur<5&&L.length===1){gridEl.children[guesses].children[cur].textContent=L;cur++}}
+}
+function flash(m){document.getElementById('msg').textContent=m;if(m&&m!=='You Win! 🎉  — '+answer)setTimeout(function(){document.getElementById('msg').textContent=''},1200)}
+kb.addEventListener('click',function(e){var t=e.target.closest('.key');if(t)type(t.dataset.k)});
+document.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();type('enter')}else if(e.key==='Backspace'){type('back')}else if(/^[a-zA-Z]$/.test(e.key)){type(e.key.toUpperCase())}});
+newGame();
+</script>
+</body>
+</html>

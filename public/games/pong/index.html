@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Pong</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#0f1019;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;overflow:hidden}
+h1{font-size:clamp(26px,6vw,40px);font-weight:800;background:linear-gradient(135deg,#6842FF,#8660FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
+canvas{background:#14152a;border:1px solid rgba(255,255,255,.12);border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.6);touch-action:none}
+#ui{display:flex;gap:12px;margin-top:14px}
+.box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px 18px;text-align:center}
+.box .l{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888}
+.box .v{font-size:20px;font-weight:700;color:#6842FF}
+button{margin-top:14px;padding:11px 26px;font-size:14px;font-weight:700;border:none;border-radius:12px;background:linear-gradient(135deg,#6842FF,#8660FF);color:#fff;cursor:pointer;box-shadow:0 10px 25px rgba(104,66,255,.35)}
+button:hover{transform:translateY(-2px)}
+</style>
+</head>
+<body>
+<h1>Pong</h1>
+<canvas id="cv" width="560" height="320"></canvas>
+<div id="ui">
+  <div class="box"><div class="l">You</div><div class="v" id="p1">0</div></div>
+  <div class="box"><div class="l">CPU</div><div class="v" id="p2">0</div></div>
+</div>
+<button id="btn" onclick="start()">Start Game</button>
+<script>
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+var W=560,H=320,PH=70,PW=10;
+var left={y:H/2-PH/2,score:0,color:'#6842FF'},right={y:H/2-PH/2,score:0,color:'#ff2e63'};
+var ball,paused=true,keys={},raf;
+function resetBall(){ball={x:W/2,y:H/2,vx:5*(Math.random()<.5?1:-1),vy:4*(Math.random()<.5?1:-1)}}
+function start(){resetBall();left.score=0;right.score=0;document.getElementById('p1').textContent=0;document.getElementById('p2').textContent=0;paused=false;document.getElementById('btn').style.display='none';loop()}
+function loop(){
+  raf=requestAnimationFrame(loop);
+  if(paused){draw();return}
+  if(keys['ArrowUp']||keys['w'])left.y-=6;if(keys['ArrowDown']||keys['s'])left.y+=6;
+  left.y=Math.max(0,Math.min(H-PH,left.y));
+  var target=ball.y-PH/2;var dx=ball.x<W/2?5:6;
+  if(right.y+PH/2<target-4)right.y+=dx;else if(right.y+PH/2>target+4)right.y-=dx;
+  right.y=Math.max(0,Math.min(H-PH,right.y));
+  ball.x+=ball.vx;ball.y+=ball.vy;
+  if(ball.y<8||ball.y>H-8){ball.vy*=-1;ball.y=Math.max(8,Math.min(H-8,ball.y))}
+  if(ball.x-PW/2-4<left.x+PW&&ball.x>left.x&&ball.y>left.y&&ball.y<left.y+PH){ball.vx=Math.abs(ball.vx)+.3;var hit=(ball.y-(left.y+PH/2))/(PH/2);ball.vy=hit*6;ball.x=left.x+PW+5}
+  if(ball.x+PW/2+4>right.x&&ball.x<right.x+PW&&ball.y>right.y&&ball.y<right.y+PH){ball.vx=-Math.abs(ball.vx)-.3;var hit2=(ball.y-(right.y+PH/2))/(PH/2);ball.vy=hit2*6;ball.x=right.x-5}
+  if(ball.x<0){right.score++;document.getElementById('p2').textContent=right.score;resetBall();if(right.score>=7){end('CPU Wins!')}}
+  if(ball.x>W){left.score++;document.getElementById('p1').textContent=left.score;resetBall();if(left.score>=7){end('You Win! 🎉')}}
+  draw();
+}
+function end(msg){paused=true;document.getElementById('btn').textContent=msg+' · Play again';document.getElementById('btn').style.display='inline-block'}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.setLineDash([8,8]);ctx.strokeStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=left.color;ctx.fillRect(0,left.y,PW,PH);
+  var g=ctx.createLinearGradient(W-PW,right.y,W,right.y);g.addColorStop(0,'#ff2e63');g.addColorStop(1,'#ff7a3d');ctx.fillStyle=g;ctx.fillRect(W-PW,right.y,PW,PH);
+  var bg=ctx.createRadialGradient(ball.x,ball.y,1,ball.x,ball.y,8);bg.addColorStop(0,'#fff');bg.addColorStop(1,'#ffd94d');ctx.fillStyle=bg;ctx.beginPath();ctx.arc(ball.x,ball.y,5,0,7);ctx.fill();
+  if(paused&&!left.score&&!right.score){ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='700 16px Segoe UI';ctx.textAlign='center';ctx.fillText('Move: W/S or ↑/↓',W/2,H/2)}
+}
+document.addEventListener('keydown',function(e){keys[e.key]=true;if(e.code==='Space'){e.preventDefault();start()}});
+document.addEventListener('keyup',function(e){keys[e.key]=false});
+cv.addEventListener('pointermove',function(e){var r=cv.getBoundingClientRect();left.y=(e.clientY-r.top)*H/r.height-PH/2;left.y=Math.max(0,Math.min(H-PH,left.y))});
+cv.addEventListener('pointerdown',function(e){e.preventDefault();start()});
+</script>
+</body>
+</html>

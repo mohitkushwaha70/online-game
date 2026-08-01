@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Space Invaders</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#0f1019;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;overflow:hidden;padding:10px}
+h1{font-size:clamp(24px,6vw,38px);font-weight:800;background:linear-gradient(135deg,#6842FF,#8660FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px}
+canvas{background:#0a0b14;border:1px solid rgba(255,255,255,.12);border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.6);touch-action:none}
+#ui{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;justify-content:center}
+.box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:6px 16px;text-align:center}
+.box .l{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888}
+.box .v{font-size:18px;font-weight:700;color:#6842FF}
+button{margin-top:14px;padding:9px 20px;font-size:13px;font-weight:700;border:none;border-radius:12px;background:linear-gradient(135deg,#6842FF,#8660FF);color:#fff;cursor:pointer;box-shadow:0 10px 25px rgba(104,66,255,.35)}
+button:hover{transform:translateY(-2px)}
+#msg{font-size:15px;min-height:22px;margin-top:8px;color:#ffd94d;font-weight:700}
+</style>
+</head>
+<body>
+<h1>Space Invaders</h1>
+<div id="msg"></div>
+<canvas id="cv" width="480" height="520"></canvas>
+<div id="ui">
+  <div class="box"><div class="l">Score</div><div class="v" id="score">0</div></div>
+  <div class="box"><div class="l">Lives</div><div class="v" id="lives">3</div></div>
+  <div class="box"><div class="l">Wave</div><div class="v" id="wave">1</div></div>
+</div>
+<button id="btn" onclick="start()">Start Game</button>
+<script>
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+var W=480,H=520;
+var player={w:46,h:14,x:0,y:H-50,life:3},inv=[],bullets=[],ebullets=[],dir=1,stepY=0,wave=1,score=0,over=true,paused=true,keys={},lastT=0,fireCd=0,ebCd=0,raf;
+var INV_COLORS=['#ff2e63','#ff7a3d','#ffb84d','#2ee6a8','#4da6ff'];
+function buildWave(){inv=[];dir=1;stepY=0;for(var r=0;r<5;r++)for(var c=0;c<10;c++)inv.push({x:30+c*42,y:60+r*32,w:32,h:22,alive:true,color:INV_COLORS[r],off:.4});ebullets=[]}
+function reset(){player.x=W/2-player.w/2;player.life=3;wave=1;score=0;bullets=[];buildWave();fireCd=0;ebCd=0;document.getElementById('score').textContent=0;document.getElementById('lives').textContent=3;document.getElementById('wave').textContent=1;over=false;paused=true;document.getElementById('btn').textContent='Click / Space to start wave 1';document.getElementById('btn').style.display='inline-block';document.getElementById('msg').textContent=''}
+function start(){if(over){reset()}paused=false;document.getElementById('btn').style.display='none';document.getElementById('msg').textContent=''}
+function shoot(){if(paused||over)return;fireCd=14;bullets.push({x:player.x+player.w/2-2,y:player.y,vy:-7})}
+function loop(t){
+  raf=requestAnimationFrame(loop);
+  if(paused){draw(t);return}
+  if(keys['ArrowLeft']||keys['a'])player.x-=5;if(keys['ArrowRight']||keys['d'])player.x+=5;
+  player.x=Math.max(0,Math.min(W-player.w,player.x));
+  if(fireCd>0)fireCd--;
+  if((keys[' ']||keys['ArrowUp'])&&fireCd===0)shoot();
+  var speed=Math.min(.5+wave*.18+inv.length*.03,1.8);
+  if(stepY>=22){dir*=-1;stepY=0;for(var i=0;i<inv.length;i++)inv[i].y+=14}
+  var moved=false;
+  for(var i=0;i<inv.length;i++){if(!inv[i].alive)continue;inv[i].x+=dir*speed;inv[i].off+=.06;moved=true;
+    if(inv[i].x<4){dir=1;stepY++}if(inv[i].x+inv[i].w>W-4){dir=-1;stepY++}}
+  if(!moved){wave++;document.getElementById('wave').textContent=wave;buildWave();document.getElementById('btn').textContent='Wave '+wave+' — click / space';document.getElementById('btn').style.display='inline-block';paused=true}
+  for(var i=bullets.length-1;i>=0;i--){var b=bullets[i];b.y+=b.vy;if(b.y<0){bullets.splice(i,1);continue}
+    for(var j=0;j<inv.length;j++){var g=inv[j];if(!g.alive)continue;
+      if(b.x>g.x&&b.x<g.x+g.w&&b.y>g.y&&b.y<g.y+g.h){g.alive=false;score+=10;document.getElementById('score').textContent=score;bullets.splice(i,1);break}}}
+  if(ebCd>0)ebCd--;var lowest={y:0};
+  if(inv.some(function(g){return g.alive})&&ebCd===0){var lc=Math.floor(Math.random()*10);
+    var col=null;for(var j=0;j<inv.length;j++){var g=inv[j];if(g.alive&&Math.floor((g.x-14)/42)===lc&&(!col||g.y>col.y))col=g}
+    if(col){ebullets.push({x:col.x+col.w/2,y:col.y+col.h,vy:3.5});ebCd=Math.max(18,55-wave*5)}}
+  for(var i=ebullets.length-1;i>=0;i--){var b=ebullets[i];b.y+=b.vy;if(b.y>H){ebullets.splice(i,1);continue}
+    if(b.x>player.x&&b.x<player.x+player.w&&b.y>player.y&&b.y<player.y+player.h){player.life--;document.getElementById('lives').textContent=player.life;ebullets.splice(i,1);
+      if(player.life<=0){over=true;document.getElementById('btn').textContent='Game Over — Score '+score+' · Play again';document.getElementById('btn').style.display='inline-block';paused=true;document.getElementById('msg').textContent=''}
+      else{document.getElementById('btn').textContent='Hit! click / space to continue';document.getElementById('btn').style.display='inline-block';paused=true}}}
+  var invBottom=0;for(var i=0;i<inv.length;i++){var g=inv[i];if(g.alive&&g.y+g.h>invBottom)invBottom=g.y+g.h}
+  if(invBottom>player.y){over=true;document.getElementById('btn').textContent='Invaders reached you — Play again';document.getElementById('btn').style.display='inline-block';paused=true}
+  draw(t);
+}
+function draw(t){
+  ctx.clearRect(0,0,W,H);
+  for(var i=0;i<bullets.length;i++){ctx.fillStyle='#ffd94d';ctx.fillRect(bullets[i].x,bullets[i].y,4,12)}
+  for(var i=0;i<ebullets.length;i++){ctx.fillStyle='#ff2e63';ctx.fillRect(ebullets[i].x,ebullets[i].y,3,10)}
+  for(var i=0;i<inv.length;i++){var g=inv[i];if(!g.alive)continue;
+    ctx.save();ctx.translate(g.x+g.w/2,g.y+g.h/2);ctx.scale(1+Math.sin(g.off)*.15,1+Math.sin(g.off)*.15);ctx.translate(-(g.x+g.w/2),-(g.y+g.h/2));
+    ctx.fillStyle=g.color;ctx.beginPath();ctx.moveTo(g.x+g.w*.2,g.y+g.h);ctx.lineTo(g.x+g.w*.2,g.y+g.h*.45);ctx.lineTo(g.x,g.y+g.h*.45);ctx.lineTo(g.x,g.y+g.h*.65);ctx.lineTo(g.x-g.w*.2,g.y+g.h*.65);ctx.lineTo(g.x-g.w*.2,g.y+g.h*.45);ctx.lineTo(g.x-g.w*.2+g.w*.4,g.y);ctx.lineTo(g.x-g.w*.2+g.w*.6,g.y);ctx.lineTo(g.x-g.w*.2+g.w,g.y+g.h*.45);ctx.lineTo(g.x-g.w*.2+g.w,g.y+g.h*.65);ctx.lineTo(g.x+g.w*.8,g.y+g.h*.65);ctx.lineTo(g.x+g.w*.8,g.y+g.h*.45);ctx.lineTo(g.x+g.w*.6,g.y+g.h*.45);ctx.lineTo(g.x+g.w*.6,g.y+g.h);ctx.closePath();ctx.fill();
+    ctx.restore()}
+  var g=ctx.createLinearGradient(player.x,player.y,player.x+player.w,player.y);g.addColorStop(0,'#6842FF');g.addColorStop(1,'#8660FF');
+  ctx.fillStyle=g;ctx.fillRect(player.x,player.y,player.w,player.h);ctx.fillStyle='rgba(255,255,255,.4)';ctx.fillRect(player.x,player.y,player.w,5);
+  if(paused&&!over){ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='700 16px Segoe UI';ctx.textAlign='center';ctx.fillText('← → move · space shoot',W/2,H/2)}
+}
+document.addEventListener('keydown',function(e){keys[e.key]=true;if(e.code==='Space'){e.preventDefault();start()}});
+document.addEventListener('keyup',function(e){keys[e.key]=false});
+cv.addEventListener('pointermove',function(e){var r=cv.getBoundingClientRect();player.x=(e.clientX-r.left)*W/r.width-player.w/2;player.x=Math.max(0,Math.min(W-player.w,player.x))});
+cv.addEventListener('pointerdown',function(e){e.preventDefault();start()});
+reset();loop(0);
+</script>
+</body>
+</html>

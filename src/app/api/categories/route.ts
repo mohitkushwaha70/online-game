@@ -9,7 +9,7 @@ export async function GET() {
     await connectDB();
     const categories = await Category.find({ isActive: true }).sort('sortOrder name');
     const res = NextResponse.json({ categories });
-    res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    res.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
     return res;
   } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 500 }); }
 }

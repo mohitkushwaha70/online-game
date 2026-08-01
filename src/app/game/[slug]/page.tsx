@@ -126,12 +126,20 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
           <div>
             {/* Game embed */}
             <div className="relative w-full bg-black rounded-xl overflow-hidden aspect-video border border-white/10">
-              <iframe
-                src={game.embedUrl}
-                className="absolute inset-0 w-full h-full"
-                allowFullScreen
-                title={game.name}
-              />
+              {game.embedUrl ? (
+                <iframe
+                  src={game.embedUrl}
+                  className="absolute inset-0 w-full h-full"
+                  allowFullScreen
+                  title={game.name}
+                />
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-4">
+                  <span className="text-4xl">🎮</span>
+                  <p className="text-sm text-gray-400">This game is not available right now.</p>
+                  <p className="text-xs text-gray-600">Try another game from the library.</p>
+                </div>
+              )}
             </div>
 
             {/* Title + actions */}

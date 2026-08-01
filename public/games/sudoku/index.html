@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Sudoku</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#0f1019;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;overflow:hidden;padding:10px}
+h1{font-size:clamp(24px,6vw,38px);font-weight:800;background:linear-gradient(135deg,#6842FF,#8660FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px}
+#board{display:grid;grid-template-columns:repeat(9,1fr);gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:6px;box-shadow:0 24px 80px rgba(0,0,0,.6);width:min(92vw,400px)}
+.cell{aspect-ratio:1;background:#1c1e31;display:flex;align-items:center;justify-content:center;font-size:clamp(14px,5vw,24px);font-weight:700;border-radius:4px;cursor:pointer;user-select:none}
+.cell.sel{background:#2c2250}
+.cell.fixed{color:#a5b1ff}
+.cell.wrong{color:#ff2e63;background:#2a1620}
+.b3{border-right:2px solid #6842FF;border-bottom:2px solid #6842FF}
+#ui{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;justify-content:center}
+.box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:6px 16px;text-align:center}
+.box .l{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888}
+.box .v{font-size:18px;font-weight:700;color:#6842FF}
+button{padding:9px 18px;font-size:13px;font-weight:700;border:none;border-radius:12px;background:linear-gradient(135deg,#6842FF,#8660FF);color:#fff;cursor:pointer;box-shadow:0 10px 25px rgba(104,66,255,.35)}
+button:hover{transform:translateY(-2px)}
+.numpad{display:grid;grid-template-columns:repeat(5,minmax(34px,1fr));gap:8px;margin-top:14px;width:min(92vw,400px)}
+.num{aspect-ratio:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;cursor:pointer}
+.num:hover{background:rgba(104,66,255,.4)}
+</style>
+</head>
+<body>
+<h1>Sudoku</h1>
+<div id="ui">
+  <button onclick="newGame('easy')">Easy</button>
+  <button onclick="newGame('medium')">Medium</button>
+  <button onclick="newGame('hard')">Hard</button>
+  <div class="box"><div class="l">Mistakes</div><div class="v" id="mistakes">0</div></div>
+</div>
+<div id="board"></div>
+<div class="numpad" id="numpad"></div>
+<script>
+var boardEl=document.getElementById('board'),numpad=document.getElementById('numpad');
+var sol,given,grid,sel,mistakes;
+var PUZZLES=[
+ {e:"530070000600195000098000060800060003400803001700020006060000280000419005000080079",s:"534678912672195348198342567859761423426853791713924856961537284287419635345286179"},
+ {e:"003020600900305001001806400008102900700000008006708200002609500800203009005010300",s:"483921657967345821251876493548132976729564138136798245372689514814253769695417382"},
+ {e:"200080300060070084030500209000105408000000000402706000301007040720040060004010003",s:"245981376169372584836594729793165438618243957452736891381457692927438165564819243"}
+];
+function newGame(level){var idx=Math.floor(Math.random()*PUZZLES.length);var p=PUZZLES[idx];
+  sol=p.s.replace(/\s/g,'').split('').map(Number);
+  var g=p.e.split('').map(Number);
+  var remove={easy:35,medium:45,hard:55}[level];
+  var givenCount=g.filter(function(x){return x>0}).length;
+  var target=81-remove;
+  var copy=g.slice();
+  while(givenCount>target){var pos=Math.floor(Math.random()*81);if(copy[pos]){copy[pos]=0;givenCount--}}
+  grid=copy;given=copy.slice();mistakes=0;sel=null;document.getElementById('mistakes').textContent=0;render()}
+function render(){var html='';for(var i=0;i<81;i++){var r=Math.floor(i/9),c=i%9;var v=grid[i];var cls='cell';
+  if(given[i])cls+=' fixed';
+  else if(v&&v!==sol[i])cls+=' wrong';
+  if(sel===i)cls+=' sel';
+  if(c===2||c===5)cls+=' b3';
+  html+='<div class="'+cls+'" data-i="'+i+'">'+(v||'')+'</div>'}
+  boardEl.innerHTML=html;
+  var nh='<div class="num" data-n="">✕</div>';for(var n=1;n<=9;n++)nh+='<div class="num" data-n="'+n+'">'+n+'</div>';numpad.innerHTML=nh;
+  if(mistakes>=3)alert('Game Over — 3 mistakes!');}
+boardEl.addEventListener('click',function(e){var t=e.target.closest('.cell');if(!t)return;var i=+t.dataset.i;if(!given[i])sel=i;render()});
+numpad.addEventListener('click',function(e){var t=e.target.closest('.num');if(!t)return;var n=t.dataset.n;
+  if(sel===null)return;if(n===''){grid[sel]=0;render();return}
+  grid[sel]=+n;if(+n!==sol[sel]){mistakes++;document.getElementById('mistakes').textContent=mistakes}
+  sel=null;render();
+  var done=true;for(var i=0;i<81;i++)if(grid[i]!==sol[i]){done=false;break}
+  if(done)alert('You Win! 🎉')});
+document.addEventListener('keydown',function(e){if(sel===null)return;var n=+e.key;if(n>=1&&n<=9){grid[sel]=n;if(n!==sol[sel]){mistakes++;document.getElementById('mistakes').textContent=mistakes}sel=null;render()}else if(e.key==='Backspace'||e.key==='Delete'){grid[sel]=0;render()}});
+newGame('medium');
+</script>
+</body>
+</html>
