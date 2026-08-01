@@ -1,3 +1,7 @@
+'use client';
+
+import { useState } from 'react';
+
 interface AvatarProps {
   avatar?: string | null;
   username?: string | null;
@@ -6,11 +10,15 @@ interface AvatarProps {
 }
 
 export default function Avatar({ avatar, username, size = 32, className = '' }: AvatarProps) {
-  if (avatar) {
+  const [imgError, setImgError] = useState(false);
+  const showImage = avatar && !imgError;
+
+  if (showImage) {
     return (
       <img
-        src={avatar}
+        src={avatar as string}
         alt=""
+        onError={() => setImgError(true)}
         className={`rounded-full object-cover shrink-0 ${className}`}
         style={{ width: size, height: size }}
       />
