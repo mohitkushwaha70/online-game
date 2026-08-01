@@ -61,7 +61,6 @@ function CategoryContent({ params }: { params: Promise<{ slug: string }> }) {
 
   return (
     <div className="min-h-screen bg-dark-950">
-      {/* Premium Hero */}
       <section className="relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${color}22, transparent 60%)` }}>
         <div className="absolute inset-0 bg-dark-950/60" />
         <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />

@@ -166,7 +166,7 @@ export default function AdminPage() {
           {/* Dashboard */}
           {page === 'dashboard' && dashData && (
             <>
-              {/* Premium Stats Grid */}
+              {/* Stats Grid */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-6 lg:mb-8">
                 {[
                   { label: 'Total Games', value: dashData.stats.totalGames, icon: '🎮', color: 'from-brand-500/20 to-brand-500/5 border-brand-500/20', accent: 'text-brand-400', sub: `${dashData.stats.activeGames} active` },
