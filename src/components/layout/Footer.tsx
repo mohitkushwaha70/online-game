@@ -60,12 +60,12 @@ export default function Footer() {
               <LogoIcon size={8} />
               <div className="flex items-center gap-2">
                 <span className="text-lg font-bold tracking-wider text-gradient">ONLINE GAME</span>
-                <span className="inline-flex items-center px-2 py-0.5 text-[9px] font-black tracking-widest uppercase bg-gradient-to-r from-yellow-400 to-amber-500 text-black rounded-full shadow-lg shadow-yellow-500/30">
-                  Premium
+                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 text-black shadow-lg shadow-yellow-500/30">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6.5l4.6 3.9L12 4.5l4.4 5.9L21 6.5 19.5 18h-15L3 6.5zM4.5 20h15v1.5h-15V20z" /></svg>
                 </span>
               </div>
             </div>
-            <p className="text-xs text-gray-500 leading-relaxed">Handpicked premium browser games. Play anything, anywhere, instantly — free forever.</p>
+            <p className="text-xs text-gray-500 leading-relaxed">Handpicked top browser games. Play anything, anywhere, instantly — free forever.</p>
           </div>
           <div>
             <h3 className="text-sm font-bold text-white tracking-wider uppercase mb-4">Categories</h3>

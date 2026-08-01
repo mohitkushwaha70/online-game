@@ -677,7 +677,7 @@ function QuickImport({ token, categories, onImported }: { token: string; categor
         </button>
       </div>
       <div className="flex flex-wrap gap-2 mt-3">
-        <button type="button" onClick={() => { setIsPremium(true); setIsFree(false); }} className={toggleClass(isPremium)}>Premium</button>
+        <button type="button" onClick={() => { setIsPremium(true); setIsFree(false); }} className={toggleClass(isPremium)}>VIP</button>
         <button type="button" onClick={() => { setIsFree(true); setIsPremium(false); }} className={toggleClass(isFree)}>Free</button>
         <button type="button" onClick={() => setIsOriginal(!isOriginal)} className={toggleClass(isOriginal)}>Original</button>
       </div>
@@ -772,7 +772,7 @@ function GameModal({ game, categories, token, onClose, onSave }: any) {
           <div className="flex flex-wrap gap-3 lg:gap-4">
             <label className="flex items-center gap-2 text-xs lg:text-sm"><input type="checkbox" checked={form.isFeatured} onChange={e => setForm({ ...form, isFeatured: e.target.checked })} className="rounded" /> Featured</label>
             <label className="flex items-center gap-2 text-xs lg:text-sm"><input type="checkbox" checked={form.isOriginal} onChange={e => setForm({ ...form, isOriginal: e.target.checked })} className="rounded" /> Original</label>
-            <label className="flex items-center gap-2 text-xs lg:text-sm"><input type="checkbox" checked={form.isPremium} onChange={e => setForm({ ...form, isPremium: e.target.checked })} className="rounded" /> Premium</label>
+            <label className="flex items-center gap-2 text-xs lg:text-sm"><input type="checkbox" checked={form.isPremium} onChange={e => setForm({ ...form, isPremium: e.target.checked })} className="rounded" /> VIP</label>
             <label className="flex items-center gap-2 text-xs lg:text-sm"><input type="checkbox" checked={form.mobileFriendly} onChange={e => setForm({ ...form, mobileFriendly: e.target.checked })} className="rounded" /> Mobile</label>
           </div>
           <div><label className="text-[10px] lg:text-xs text-white/40 block mb-1">Status</label><select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm"><option value="active">Active</option><option value="inactive">Inactive</option><option value="pending">Pending</option></select></div>

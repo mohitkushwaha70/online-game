@@ -208,12 +208,12 @@ export default function HomePage() {
         {/* Content */}
         <div className="relative max-w-7xl mx-auto px-4 py-16 sm:py-20 lg:py-24 text-center w-full">
           <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-6 leading-[1.1]">
-            Play <span className="bg-clip-text text-transparent bg-[length:200%_auto] animate-[shimmer_3s_linear_infinite]" style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--brand-400-rgb)), rgb(var(--brand-500-rgb)), rgb(var(--brand-400-rgb)))' }}>Premium Games</span>
+            Play <span className="bg-clip-text text-transparent bg-[length:200%_auto] animate-[shimmer_3s_linear_infinite]" style={{ backgroundImage: 'linear-gradient(135deg, rgb(var(--brand-400-rgb)), rgb(var(--brand-500-rgb)), rgb(var(--brand-400-rgb)))' }}>Best Games</span>
             <br className="hidden sm:block" />
             <span className="text-white"> for Free</span>
           </h1>
           <p className="text-base sm:text-lg text-gray-400 max-w-xl mx-auto mb-10 px-4">
-            Handpicked premium browser games. Action, racing, puzzles — play anything, anywhere, instantly.
+            Handpicked top browser games. Action, racing, puzzles — play anything, anywhere, instantly.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 px-4">
             <Link href="#games" className="group relative px-8 py-3.5 text-white font-bold rounded-xl transition-all text-center min-h-[48px] flex items-center justify-center text-sm sm:text-base hover:scale-105" style={{ background: 'linear-gradient(135deg, rgb(var(--brand-500-rgb)), rgb(var(--brand-500-rgb) / 0.85))', boxShadow: '0 10px 15px -3px rgb(var(--brand-500-rgb) / 0.25)' }}>

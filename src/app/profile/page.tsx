@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -15,13 +15,37 @@ interface UserComment {
 }
 
 export default function ProfilePage() {
-  const { user, token, logout } = useAuth();
+  const { user, token, logout, updateUser } = useAuth();
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
   const [favorites, setFavorites] = useState<Game[]>([]);
   const [recentGames, setRecentGames] = useState<Game[]>([]);
   const [reviews, setReviews] = useState<UserComment[]>([]);
   const [activeTab, setActiveTab] = useState<'favorites' | 'recent' | 'reviews'>('favorites');
   const [loading, setLoading] = useState(true);
+
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+    if (!file.type.startsWith('image/')) return;
+    setUploading(true);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const res = await fetch('/api/user/avatar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ avatar: reader.result }),
+        });
+        const data = await res.json();
+        if (res.ok && data.avatar) updateUser({ avatar: data.avatar });
+      } catch {}
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+    reader.readAsDataURL(file);
+  };
 
   useEffect(() => {
     if (!user) { router.push('/login'); return; }
@@ -49,15 +73,26 @@ export default function ProfilePage() {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6 lg:p-8 mb-8">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-            <button type="button" className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0 bg-gradient-to-r from-brand-500 to-brand-400 cursor-pointer hover:scale-105 active:scale-95 hover:shadow-lg hover:shadow-brand-500/40 transition-all duration-200">
-              {user.avatar ? (
-                <img src={user.avatar} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-r from-brand-500 to-brand-400 flex items-center justify-center text-3xl font-black text-white">
-                  {user.username?.[0]?.toUpperCase() || 'U'}
-                </div>
+            <div className="relative flex-shrink-0">
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-r from-brand-500 to-brand-400 cursor-pointer hover:scale-105 active:scale-95 hover:shadow-lg hover:shadow-brand-500/40 transition-all duration-200 relative block group">
+                {user.avatar ? (
+                  <img src={user.avatar} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-r from-brand-500 to-brand-400 flex items-center justify-center text-3xl font-black text-white">
+                    {user.username?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                )}
+                <span className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center border-2 border-dark-950 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </span>
+              </button>
+              {(user.premium?.isActive || user.premium?.plan) && (
+                <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 text-black flex items-center justify-center shadow-lg shadow-yellow-500/40 ring-2 ring-dark-950">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6.5l4.6 3.9L12 4.5l4.4 5.9L21 6.5 19.5 18h-15L3 6.5zM4.5 20h15v1.5h-15V20z" /></svg>
+                </span>
               )}
-            </button>
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+            </div>
             <div className="text-center sm:text-left flex-1 min-w-0">
               <h1 className="text-xl sm:text-2xl font-bold text-white truncate">{user.username}</h1>
               <p className="text-sm text-gray-400 truncate">{user.email}</p>
@@ -65,7 +100,9 @@ export default function ProfilePage() {
                 <span className="inline-block mt-2 px-3 py-1 bg-brand-500/20 text-brand-400 text-xs font-medium rounded-full border border-brand-500/30">Admin</span>
               )}
               {(user.premium?.isActive || user.premium?.plan) && (
-                <span className="inline-block mt-2 px-3 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-medium rounded-full border border-yellow-500/30">Premium</span>
+                <span className="inline-flex items-center justify-center mt-2 w-7 h-7 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 text-black shadow-lg shadow-yellow-500/30">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6.5l4.6 3.9L12 4.5l4.4 5.9L21 6.5 19.5 18h-15L3 6.5zM4.5 20h15v1.5h-15V20z" /></svg>
+                </span>
               )}
             </div>
           </div>

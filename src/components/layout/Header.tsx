@@ -112,8 +112,8 @@ export default function Header() {
         <Link href="/" className="flex items-center gap-2 min-touch">
           <LogoIcon size={8} />
           <span className="hidden sm:block text-lg font-bold tracking-wider text-gradient">{siteName}</span>
-          <span className="hidden md:inline-flex items-center px-2 py-0.5 text-[9px] font-black tracking-widest uppercase bg-gradient-to-r from-yellow-400 to-amber-500 text-black rounded-full shadow-lg shadow-yellow-500/30">
-            Premium
+          <span className="hidden md:inline-flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 text-black shadow-lg shadow-yellow-500/30">
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6.5l4.6 3.9L12 4.5l4.4 5.9L21 6.5 19.5 18h-15L3 6.5zM4.5 20h15v1.5h-15V20z" /></svg>
           </span>
         </Link>
 
@@ -234,7 +234,7 @@ export default function Header() {
                     >
                       {siteName}
                     </div>
-                    <div className="text-[10px] text-gray-500 uppercase tracking-widest">Premium Gaming</div>
+                    <div className="text-[10px] text-gray-500 uppercase tracking-widest">Ultimate Gaming</div>
                   </div>
                 </Link>
               </div>
@@ -265,7 +265,7 @@ export default function Header() {
                         key={cat.slug}
                         href={`/category/${cat.slug}`}
                         onClick={closeMenu}
-                        className="px-4 py-2.5 min-h-[44px] rounded-xl text-sm font-bold bg-gradient-to-r from-brand-500/30 to-brand-400/10 text-white border border-brand-500/40 hover:from-brand-500/50 hover:to-brand-400/25 hover:border-brand-400/60 transition-all inline-flex items-center justify-center"
+                        className="px-4 py-2.5 min-h-[44px] rounded-xl text-sm font-bold bg-gradient-to-r from-brand-500 to-brand-400 text-white border border-brand-300/50 shadow-lg shadow-brand-500/30 hover:from-brand-400 hover:to-brand-500 hover:scale-[1.04] hover:shadow-brand-500/50 transition-all inline-flex items-center justify-center"
                       >
                         {cat.name}
                       </Link>
@@ -291,17 +291,17 @@ export default function Header() {
               {/* Scrollable menu items */}
               <div className="flex-1 overflow-y-auto px-5 py-4 space-y-1">
                 <motion.div custom={2} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-white hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
+                  <Link href="/" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/20 to-brand-400/5 border border-brand-500/25 text-white hover:from-brand-500/40 hover:to-brand-400/20 hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
                     <span className="text-xl">🏠</span> Home
                   </Link>
                 </motion.div>
                 <motion.div custom={3} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/?sort=popular" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
+                  <Link href="/?sort=popular" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
                     <span className="text-xl">🎮</span> All Games
                   </Link>
                 </motion.div>
                 <motion.div custom={4} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/?sort=newest" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
+                  <Link href="/?sort=newest" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
                     <span className="text-xl">⭐</span> New Games
                   </Link>
                 </motion.div>
@@ -309,17 +309,17 @@ export default function Header() {
                 <div className="border-t border-white/5 my-2" />
 
                 <motion.div custom={5} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/favorites" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
+                  <Link href="/favorites" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
                     <span className="text-xl">❤️</span> Favorites
                   </Link>
                 </motion.div>
                 <motion.div custom={6} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/recently-played" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
+                  <Link href="/recently-played" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
                     <span className="text-xl">🕒</span> Recently Played
                   </Link>
                 </motion.div>
                 <motion.div custom={7} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/profile" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
+                  <Link href="/profile" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
                     <span className="text-xl">👤</span> Profile
                   </Link>
                 </motion.div>
@@ -327,22 +327,22 @@ export default function Header() {
                 <div className="border-t border-white/5 my-2" />
 
                 <motion.div custom={8} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/contact" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
+                  <Link href="/contact" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
                     <span className="text-xl">📞</span> Contact
                   </Link>
                 </motion.div>
                 <motion.div custom={9} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/about" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
+                  <Link href="/about" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
                     <span className="text-xl">📄</span> About
                   </Link>
                 </motion.div>
                 <motion.div custom={10} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/privacy" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
+                  <Link href="/privacy" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
                     <span className="text-xl">🔒</span> Privacy Policy
                   </Link>
                 </motion.div>
                 <motion.div custom={11} variants={itemVariants} initial="hidden" animate="visible">
-                  <Link href="/terms" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium text-gray-300 hover:bg-brand-500/15 hover:text-brand-400 rounded-xl transition-colors">
+                  <Link href="/terms" onClick={closeMenu} className="flex items-center gap-3 px-4 py-3 min-h-[48px] text-[17px] font-medium bg-gradient-to-r from-brand-500/15 to-brand-400/5 border border-brand-500/20 text-gray-200 hover:from-brand-500/35 hover:to-brand-400/20 hover:text-white hover:border-brand-400/50 hover:scale-[1.02] rounded-xl transition-all">
                     <span className="text-xl">📜</span> Terms of Service
                   </Link>
                 </motion.div>
