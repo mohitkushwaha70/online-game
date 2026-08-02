@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Connect 4</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#0f1019;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;overflow:hidden;padding:10px}
+h1{font-size:clamp(24px,6vw,38px);font-weight:800;background:linear-gradient(135deg,#6842FF,#8660FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px}
+canvas{background:#1c1e31;border:1px solid rgba(255,255,255,.12);border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.6);touch-action:none;cursor:pointer}
+#ui{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;justify-content:center;align-items:center}
+.box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:6px 16px;text-align:center}
+.box .l{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888}
+.box .v{font-size:18px;font-weight:700;color:#6842FF}
+button{padding:9px 20px;font-size:13px;font-weight:700;border:none;border-radius:12px;background:linear-gradient(135deg,#6842FF,#8660FF);color:#fff;cursor:pointer;box-shadow:0 10px 25px rgba(104,66,255,.35)}
+button:hover{transform:translateY(-2px)}
+#msg{font-size:15px;min-height:22px;margin-top:10px;color:#ffd94d;font-weight:700}
+</style>
+</head>
+<body>
+<h1>Connect 4</h1>
+<div id="msg"></div>
+<canvas id="cv" width="420" height="360"></canvas>
+<div id="ui">
+  <button onclick="newGame(true)">vs Player</button>
+  <button onclick="newGame(false)">vs CPU</button>
+  <div class="box"><div class="l">P1</div><div class="v" style="color:#ff2e63" id="p1">0</div></div>
+  <div class="box"><div class="l">P2</div><div class="v" style="color:#2ee6a8" id="p2">0</div></div>
+</div>
+<script>
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+var COLS=7,ROWS=6,CELL=54,TOP=40;
+var W=COLS*CELL,H=TOP+ROWS*CELL;
+var grid,turn,over,vsCpu,scores={p1:0,p2:0},hover;
+function newGame(cpu){vsCpu=cpu;grid=[];for(var r=0;r<ROWS;r++){grid[r]=[];for(var c=0;c<COLS;c++)grid[r][c]=0}
+  turn=1;over=false;document.getElementById('msg').textContent=vsCpu?'You are 🔴 — vs CPU':'P1 🔴 vs P2 🟢';draw()}
+function colY(c){for(var r=ROWS-1;r>=0;r--)if(grid[r][c]===0)return r;return -1}
+function drop(c){var r=colY(c);if(r<0||over)return;grid[r][c]=turn;
+  if(check(r,c)){over=true;var w=turn===1?'P1':'P2';if(vsCpu&&turn===2)w='CPU';
+    document.getElementById('msg').textContent='You Win! 🎉'+(vsCpu&&turn===1?'':w+' wins!');
+    scores[turn===1?'p1':'p2']++;document.getElementById('p1').textContent=scores.p1;document.getElementById('p2').textContent=scores.p2;
+    if(vsCpu&&turn===2)document.getElementById('msg').textContent='CPU wins!';}
+  else if(grid.every(function(row){return row.every(function(x){return x>0})})){over=true;document.getElementById('msg').textContent='Draw! 🤝'}
+  else{turn=turn===1?2:1;if(vsCpu&&turn===2)setTimeout(cpuMove,500)}
+  draw()}
+function check(r,c){var p=grid[r][c];if(!p)return false;var dirs=[[1,0],[0,1],[1,1],[1,-1]];
+  for(var d=0;d<4;d++){var dx=dirs[d][0],dy=dirs[d][1];var count=1;
+    for(var s=1;s<4;s++){var rr=r+dx*s,cc=c+dy*s;if(rr>=0&&rr<ROWS&&cc>=0&&cc<COLS&&grid[rr][cc]===p)count++;else break}
+    for(var s=1;s<4;s++){var rr=r-dx*s,cc=c-dy*s;if(rr>=0&&rr<ROWS&&cc>=0&&cc<COLS&&grid[rr][cc]===p)count++;else break}
+    if(count>=4)return true}
+  return false}
+function cpuMove(){var best=null;for(var c=0;c<COLS;c++){if(colY(c)<0)continue;var score=evalCol(c);if(best===null||score>best.score)best={c:c,score:score}}
+  if(best)drop(best.c)}
+function evalCol(c){var p=2;var r=colY(c);if(r<0)return -99;
+  if(wouldWin(r,c,2))return 1000;
+  if(wouldWin(r,c,1))return 900;
+  return Math.random()*10}
+function wouldWin(r,c,p){grid[r][c]=p;var w=check(r,c);grid[r][c]=0;return w}
+cv.addEventListener('click',function(e){var r=cv.getBoundingClientRect();var c=Math.floor((e.clientX-r.left)*W/r.width/CELL);c=Math.max(0,Math.min(COLS-1,c));
+  if(vsCpu&&turn===2)return;drop(c)});
+cv.addEventListener('mousemove',function(e){var r=cv.getBoundingClientRect();hover=Math.floor((e.clientX-r.left)*W/r.width/CELL);draw()});
+cv.addEventListener('mouseleave',function(){hover=null;draw()});
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  if(hover!==null&&!over){var g=ctx.createRadialGradient(hover*CELL+CELL/2,TOP/2,2,hover*CELL+CELL/2,TOP/2,16);g.addColorStop(0,'rgba(255,255,255,.5)');g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.fillRect(hover*CELL,0,CELL,TOP)}
+  for(var c=0;c<COLS;c++)for(var r=0;r<ROWS;r++){
+    ctx.beginPath();ctx.arc(c*CELL+CELL/2,r*CELL+CELL/2+TOP,CELL/2-7,0,7);ctx.fillStyle='#0f1019';ctx.fill();
+    if(grid[r][c]){var g=ctx.createRadialGradient(c*CELL+CELL/2-8,r*CELL+TOP+CELL/2-10,2,c*CELL+CELL/2,r*CELL+TOP+CELL/2,CELL/2);
+      g.addColorStop(0,'#fff');g.addColorStop(.3,grid[r][c]===1?'#ff5c85':'#5df0bd');g.addColorStop(1,grid[r][c]===1?'#e01e4f':'#16b27e');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(c*CELL+CELL/2,r*CELL+CELL/2+TOP,CELL/2-7,0,7);ctx.fill()}}
+}
+newGame(false);
+</script>
+</body>
+</html>

@@ -1,32 +1,47 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useSettings } from '@/components/SettingsProvider';
+import connectDB from '@/lib/mongodb';
+import { Game, Category, SiteConfig } from '@/lib/models';
+import HomeHero from '@/components/HomeHero';
+import GameCarousel from '@/components/game/GameCarousel';
 
-export default function HomePage() {
-  const { siteName } = useSettings();
-  const [totalGames, setTotalGames] = useState(0);
-  const [totalCategories, setTotalCategories] = useState(0);
+export const dynamic = 'force-dynamic';
 
-  useEffect(() => {
-    let cancelled = false;
-    const refresh = () => {
-      Promise.all([
-        fetch('/api/games?limit=1').then(r => r.json()),
-        fetch('/api/categories').then(r => r.json()),
-      ])
-        .then(([gamesData, catsData]) => {
-          if (cancelled) return;
-          if (typeof gamesData?.total === 'number') setTotalGames(gamesData.total);
-          if (Array.isArray(catsData?.categories)) setTotalCategories(catsData.categories.length);
-        })
-        .catch(() => {});
+const FALLBACK_SETTINGS = { siteName: 'ONLINE GAME', accentColor: '#7c3aed' };
+
+async function getData() {
+  try {
+    await connectDB();
+    const [totalGames, totalCategories, configs, featured, games] = await Promise.all([
+      Game.countDocuments({ status: 'active' }),
+      Category.countDocuments({ isActive: true }),
+      SiteConfig.find({}),
+      Game.find({ status: 'active', isFeatured: true })
+        .populate('category', 'name slug color')
+        .sort('-totalPlays')
+        .limit(12),
+      Game.find({ status: 'active' })
+        .populate('category', 'name slug color')
+        .sort('-totalPlays')
+        .limit(12),
+    ]);
+    const settings: Record<string, any> = {};
+    for (const doc of configs) settings[doc.key] = doc.value;
+    const siteName = typeof settings.siteName === 'string' && settings.siteName ? settings.siteName : FALLBACK_SETTINGS.siteName;
+    const serialize = (g: any) => JSON.parse(JSON.stringify(g));
+    return {
+      totalGames,
+      totalCategories,
+      siteName,
+      featured: featured.map(serialize),
+      games: games.map(serialize),
     };
-    refresh();
-    const id = setInterval(refresh, 15000);
-    return () => { cancelled = true; clearInterval(id); };
-  }, []);
+  } catch {
+    return { totalGames: 0, totalCategories: 0, siteName: FALLBACK_SETTINGS.siteName, featured: [], games: [] };
+  }
+}
+
+export default async function HomePage() {
+  const { totalGames, totalCategories, siteName, featured, games } = await getData();
 
   return (
     <div className="min-h-screen bg-dark-950">
@@ -63,24 +78,21 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="flex items-center justify-center gap-4 sm:gap-10 mt-10 sm:mt-12 text-center">
-            <div>
-              <div className="text-base sm:text-2xl font-black text-white">{totalGames}</div>
-              <div className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Games</div>
-            </div>
-            <div className="w-px h-6 sm:h-8 bg-white/10" />
-            <div>
-              <div className="text-base sm:text-2xl font-black text-white">{totalCategories}</div>
-              <div className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Categories</div>
-            </div>
-            <div className="w-px h-6 sm:h-8 bg-white/10" />
-            <div>
-              <div className="text-base sm:text-2xl font-black text-white">Free</div>
-              <div className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Forever</div>
-            </div>
-          </div>
+          <HomeHero initialGames={totalGames} initialCategories={totalCategories} />
         </div>
       </section>
+
+      {/* Games */}
+      {games.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 py-10 sm:py-14">
+          {featured.length > 0 && (
+            <div className="mb-8">
+              <GameCarousel title="Featured Games" games={featured} viewAllLink="/category" />
+            </div>
+          )}
+          <GameCarousel title="All Games" games={games} viewAllLink="/category" />
+        </section>
+      )}
     </div>
   );
 }

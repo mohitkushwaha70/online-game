@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Memory Match</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#0f1019;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;overflow:hidden;padding:10px}
+h1{font-size:clamp(24px,6vw,38px);font-weight:800;background:linear-gradient(135deg,#6842FF,#8660FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px}
+#grid{display:grid;gap:8px;width:min(92vw,420px)}
+.card{aspect-ratio:1;background:linear-gradient(135deg,#6842FF,#8660FF);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(22px,8vw,40px);cursor:pointer;transition:transform .15s;box-shadow:0 8px 24px rgba(104,66,255,.25)}
+.card:hover{transform:scale(1.04)}
+.card.flip{background:#1c1e31;border:1px solid rgba(255,255,255,.15);box-shadow:none}
+.card.matched{background:#22a06b;box-shadow:0 8px 24px rgba(34,160,107,.25)}
+.card.hidden{visibility:hidden}
+#ui{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;justify-content:center;align-items:center}
+.box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:6px 16px;text-align:center}
+.box .l{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888}
+.box .v{font-size:18px;font-weight:700;color:#6842FF}
+button{padding:9px 20px;font-size:13px;font-weight:700;border:none;border-radius:12px;background:linear-gradient(135deg,#6842FF,#8660FF);color:#fff;cursor:pointer;box-shadow:0 10px 25px rgba(104,66,255,.35)}
+button:hover{transform:translateY(-2px)}
+select{padding:9px;font-size:13px;border-radius:10px;background:#1e2033;color:#fff;border:1px solid rgba(255,255,255,.15)}
+</style>
+</head>
+<body>
+<h1>Memory Match</h1>
+<div id="ui">
+  <select id="size" onchange="newGame()">
+    <option value="12">4×3</option>
+    <option value="16" selected>4×4</option>
+    <option value="20">5×4</option>
+  </select>
+  <div class="box"><div class="l">Moves</div><div class="v" id="moves">0</div></div>
+  <div class="box"><div class="l">Pairs</div><div class="v" id="pairs">0</div></div>
+  <button onclick="newGame()">New Game</button>
+</div>
+<div id="grid"></div>
+<script>
+var EMO=['🚀','🌟','🎈','🎯','🍕','🍎','🐸','🦄','🌈','🎸','⚽','🍩','🐱','🐶','🚗','🎪','🍉','🔮','🎨','🐬'];
+var gridEl=document.getElementById('grid');
+var cards=[],moves=0,found=0,flipped=[],lock=false;
+function newGame(){var n=+document.getElementById('size').value;var cols=n/2>6?6:n/2>=5?5:4;
+  var em=EMO.slice(0,n/2);cards=[];em.forEach(function(e){cards.push(e,e)});
+  for(var i=cards.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=cards[i];cards[i]=cards[j];cards[j]=t}
+  moves=0;found=0;flipped=[];lock=false;document.getElementById('moves').textContent=0;document.getElementById('pairs').textContent=0;
+  gridEl.style.gridTemplateColumns='repeat('+cols+',minmax(0,1fr))';
+  var html='';cards.forEach(function(e,i){html+='<div class="card" data-i="'+i+'"></div>'});gridEl.innerHTML=html}
+gridEl.addEventListener('click',function(e){var t=e.target.closest('.card');if(!t||lock)return;
+  var i=+t.dataset.i;if(t.classList.contains('flip')||t.classList.contains('matched'))return;
+  t.textContent=cards[i];t.classList.add('flip');flipped.push(i);
+  if(flipped.length===2){lock=true;moves++;document.getElementById('moves').textContent=moves;
+    if(cards[flipped[0]]===cards[flipped[1]]){found++;document.getElementById('pairs').textContent=found;
+      flipped.forEach(function(k){gridEl.children[k].classList.remove('flip');gridEl.children[k].classList.add('matched')});
+      flipped=[];lock=false;
+      if(found===cards.length/2)setTimeout(function(){alert('You Win! 🎉  — '+moves+' moves')},200)}
+    else{var a=flipped[0],b=flipped[1];flipped=[];setTimeout(function(){gridEl.children[a].textContent='';gridEl.children[a].classList.remove('flip');gridEl.children[b].textContent='';gridEl.children[b].classList.remove('flip');lock=false},700)}}});
+newGame();
+</script>
+</body>
+</html>

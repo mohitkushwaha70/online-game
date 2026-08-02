@@ -40,7 +40,12 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const { id } = await params;
     const game = await Game.findByIdAndDelete(id);
     if (!game) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    if (game.category) await Category.findByIdAndUpdate(game.category, { $inc: { gameCount: -1 } });
+    if (game.category) {
+      const cat = await Category.findById(game.category);
+      if (cat && cat.gameCount > 0) {
+        await Category.findByIdAndUpdate(cat._id, { $inc: { gameCount: -1 } });
+      }
+    }
     return NextResponse.json({ message: 'Deleted' });
   } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 500 }); }
 }
