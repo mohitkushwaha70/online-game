@@ -4,30 +4,53 @@ import { AuthProvider } from "@/lib/auth-context";
 import Header from "@/components/layout/Header";
 import FooterWrapper from "@/components/layout/FooterWrapper";
 import SettingsProvider from "@/components/SettingsProvider";
+import connectDB from "@/lib/mongodb";
+import { SiteConfig } from "@/lib/models";
 
+export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Online Gaming",
-  description: "Play the best free online games directly in your browser. No downloads required. Action, puzzle, racing, shooting, and more.",
-  keywords: "free online games, browser games, html5 games, no download games, play online",
-  icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: '48x48' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
-      { url: '/favicon-16x16.png', type: 'image/png', sizes: '16x16' },
-    ],
-    shortcut: '/favicon.ico',
-    apple: [
-      { url: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180' },
-    ],
-  },
-  openGraph: {
-    title: "Online Gaming",
-    description: "Play the best free online games directly in your browser.",
-    type: "website",
-  },
-};
+const FALLBACK_SETTINGS = { siteName: "ONLINE GAME", accentColor: "#7c3aed" };
+
+async function getSiteSettings() {
+  try {
+    await connectDB();
+    const docs = await SiteConfig.find({});
+    const settings: Record<string, any> = {};
+    for (const doc of docs) settings[doc.key] = doc.value;
+    return {
+      siteName: typeof settings.siteName === 'string' && settings.siteName ? settings.siteName : FALLBACK_SETTINGS.siteName,
+      accentColor: typeof settings.accentColor === 'string' && settings.accentColor ? settings.accentColor : FALLBACK_SETTINGS.accentColor,
+    };
+  } catch {
+    return FALLBACK_SETTINGS;
+  }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const s = await getSiteSettings();
+  return {
+    title: s.siteName,
+    description: "Play the best free online games directly in your browser. No downloads required. Action, puzzle, racing, shooting, and more.",
+    keywords: "free online games, browser games, html5 games, no download games, play online",
+    icons: {
+      icon: [
+        { url: '/favicon.ico', sizes: '48x48' },
+        { url: '/favicon.svg', type: 'image/svg+xml' },
+        { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
+        { url: '/favicon-16x16.png', type: 'image/png', sizes: '16x16' },
+      ],
+      shortcut: '/favicon.ico',
+      apple: [
+        { url: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180' },
+      ],
+    },
+    openGraph: {
+      title: s.siteName,
+      description: "Play the best free online games directly in your browser.",
+      type: "website",
+    },
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -37,15 +60,21 @@ export const viewport: Viewport = {
   themeColor: "#0a0a10",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const settings = await getSiteSettings();
+  const serverAccent = settings.accentColor;
+  const serverSiteName = settings.siteName;
   return (
     <html lang="en" className="dark">
       <body className="min-h-screen bg-dark-950 text-white overflow-x-hidden">
         <script dangerouslySetInnerHTML={{ __html: `(function(){
   try {
+    var SERVER_ACCENT = ${JSON.stringify(serverAccent)};
+    var SERVER_SITE = ${JSON.stringify(serverSiteName)};
     var raw = localStorage.getItem('site-settings');
-    var accent = null;
-    if (raw) { var s = JSON.parse(raw); accent = s.accentColor; }
+    var accent = SERVER_ACCENT || null;
+    if (raw && !accent) { try { var s = JSON.parse(raw); accent = s.accentColor; } catch(e){} }
+    try { if (SERVER_SITE) document.title = SERVER_SITE; } catch(e){}
     function hex2rgb(hex){ var h = hex.replace('#',''); return parseInt(h.slice(0,2),16)+' '+parseInt(h.slice(2,4),16)+' '+parseInt(h.slice(4,6),16); }
     function lighten(hex,amt){ var h = hex.replace('#',''); return Math.min(255,parseInt(h.slice(0,2),16)+amt)+' '+Math.min(255,parseInt(h.slice(2,4),16)+amt)+' '+Math.min(255,parseInt(h.slice(4,6),16)+amt); }
     function darken(hex,amt){ var h = hex.replace('#',''); return Math.max(0,parseInt(h.slice(0,2),16)-amt)+' '+Math.max(0,parseInt(h.slice(2,4),16)-amt)+' '+Math.max(0,parseInt(h.slice(4,6),16)-amt); }
@@ -55,6 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       var rgb = hex2rgb(accent);
       root.style.setProperty('--accent-color', accent);
       root.style.setProperty('--accent-from', accent);
+      root.style.setProperty('--accent-to', hexToHex(accent,60));
       root.style.setProperty('--brand-rgb', rgb);
       root.style.setProperty('--brand-500-rgb', rgb);
       root.style.setProperty('--brand-400-rgb', lighten(accent,30));
