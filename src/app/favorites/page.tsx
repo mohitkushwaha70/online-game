@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { Game } from '@/lib/types';
+import { gameColor } from '@/lib/utils';
 
 export default function FavoritesPage() {
   const { user, token } = useAuth();
@@ -49,7 +50,7 @@ export default function FavoritesPage() {
                   {game.thumbnail ? (
                     <img src={game.thumbnail} alt={game.name} className="w-full h-full object-cover transition-transform group-hover:scale-110" loading="lazy" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${game.color || '#7c3aed'}, ${game.color || '#3B82F6'}88)` }}>
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${gameColor(game)}, ${gameColor(game)}88)` }}>
                       <span className="text-3xl font-black text-white/80">{game.name?.[0]?.toUpperCase() || '?'}</span>
                     </div>
                   )}

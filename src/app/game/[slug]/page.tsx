@@ -132,6 +132,7 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
                   className="absolute inset-0 w-full h-full"
                   allowFullScreen
                   title={game.name}
+                  onError={() => {}}
                 />
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-4">

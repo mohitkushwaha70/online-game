@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { Game } from '@/lib/types';
+import { gameColor } from '@/lib/utils';
 
 interface UserComment {
   _id: string;
@@ -177,7 +178,7 @@ export default function ProfilePage() {
                 <Link key={r._id} href={`/game/${r.game.slug}`} className="block bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4 hover:bg-white/10 transition group">
                   <div className="flex items-start gap-3">
                     <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 flex items-center justify-center text-lg font-bold text-white"
-                      style={{ background: r.game.color ? `linear-gradient(135deg, ${r.game.color}, ${r.game.color}88)` : 'linear-gradient(135deg, #7c3aed, #3B82F688)' }}
+                      style={{ background: `linear-gradient(135deg, ${gameColor(r.game)}, ${gameColor(r.game)}88)` }}
                     >
                       {r.game.thumbnail ? <img src={r.game.thumbnail} alt="" className="w-full h-full object-cover" /> : r.game.name[0]}
                     </div>
@@ -208,7 +209,7 @@ export default function ProfilePage() {
                   {game.thumbnail ? (
                     <img src={game.thumbnail} alt={game.name} className="w-full h-full object-cover transition-transform group-hover:scale-110" loading="lazy" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${game.color || '#7c3aed'}, ${game.color || '#3B82F6'}88)` }}>
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${gameColor(game)}, ${gameColor(game)}88)` }}>
                       <span className="text-3xl font-black text-white/80">{game.name?.[0]?.toUpperCase() || '?'}</span>
                     </div>
                   )}

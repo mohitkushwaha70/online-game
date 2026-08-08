@@ -650,7 +650,7 @@ function QuickImport({ token, categories, onImported }: { token: string; categor
       const res = await fetch('/api/admin/games', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ name, slug: spaceName, embedUrl, category: catId, status: 'active', isFeatured: false, mobileFriendly: true, tags: [], isPremium, isOriginal })
+        body: JSON.stringify({ name, slug: spaceName, embedUrl, category: catId, status: 'active', isFeatured: false, mobileFriendly: true, tags: [], isPremium, isOriginal, color: categories.find((c: any) => c._id === catId)?.color })
       });
       const data = await res.json();
       if (data.game) {
@@ -765,7 +765,11 @@ function GameModal({ game, categories, token, onClose, onSave }: any) {
           </div>
 
           <div className="grid grid-cols-2 gap-3 lg:gap-4">
-            <div><label className="text-[10px] lg:text-xs text-white/40 block mb-1">Category</label><select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm"><option value="">Select</option>{categories.map((c: any) => <option key={c._id} value={c._id}>{c.name}</option>)}</select></div>
+            <div><label className="text-[10px] lg:text-xs text-white/40 block mb-1">Category</label><select value={form.category} onChange={e => {
+              const cid = e.target.value;
+              const cat = categories.find((c: any) => c._id === cid);
+              setForm({ ...form, category: cid, color: cat?.color || form.color });
+            }} className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm"><option value="">Select</option>{categories.map((c: any) => <option key={c._id} value={c._id}>{c.name}</option>)}</select></div>
             <div><label className="text-[10px] lg:text-xs text-white/40 block mb-1">Embed URL</label><input value={form.embedUrl} onChange={e => setForm({ ...form, embedUrl: e.target.value })} className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-brand-500" /></div>
           </div>
           <div className="grid grid-cols-2 gap-3 lg:gap-4">

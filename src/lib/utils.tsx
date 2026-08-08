@@ -36,6 +36,11 @@ export function UserAvatar({ name, src, size = 40 }: { name: string; src?: strin
   );
 }
 
+export function gameColor(game: any): string {
+  if (game?.category && typeof game.category === 'object' && game.category.color) return game.category.color;
+  return game?.color || '#7c3aed';
+}
+
 export function formatNumber(n: number): string {
   if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
   if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';

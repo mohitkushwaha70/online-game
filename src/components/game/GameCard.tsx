@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Game } from '@/lib/types';
 import { useAuth } from '@/lib/auth-context';
+import { gameColor } from '@/lib/utils';
 
 interface GameCardProps {
   game: Game;
@@ -53,7 +54,7 @@ export default function GameCard({ game, showFav }: GameCardProps) {
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${game.color || '#7c3aed'}, ${game.color || '#3B82F6'}88)` }}>
+          <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${gameColor(game)}, ${gameColor(game)}88)` }}>
             <span className="text-3xl font-black text-white/80">{game.name?.[0]?.toUpperCase() || '?'}</span>
           </div>
         )}
