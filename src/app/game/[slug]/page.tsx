@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { Game } from '@/lib/types';
 import GameCard from '@/components/game/GameCard';
+import { gameColor } from '@/lib/utils';
 import { addRecentGame } from '@/lib/recent-local';
 import Avatar from '@/components/ui/Avatar';
 
@@ -295,7 +296,7 @@ export default function GamePage({ params }: { params: Promise<{ slug: string }>
                         className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition group border border-white/5"
                       >
                         <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 flex items-center justify-center text-xl font-bold text-white"
-                          style={{ background: g.color ? `linear-gradient(135deg, ${g.color}, ${g.color}88)` : 'linear-gradient(135deg, #7c3aed, #3B82F688)' }}
+                          style={{ background: `linear-gradient(135deg, ${gameColor(g)}, ${gameColor(g)}88)` }}
                         >
                           {g.thumbnail ? (
                             <img src={g.thumbnail} alt={g.name} className="w-full h-full object-cover" />
