@@ -1,5 +1,3 @@
-'use client';
-
 interface LogoIconProps {
   size?: number;
   className?: string;
@@ -8,11 +6,11 @@ interface LogoIconProps {
 export default function LogoIcon({ size = 8, className = '' }: LogoIconProps) {
   return (
     <div
-      className={`rounded-lg flex items-center justify-center shrink-0 ${className}`}
+      className={`rounded-xl flex items-center justify-center shrink-0 shadow-[0_4px_14px_-4px_rgba(0,229,255,0.45)] ${className}`}
       style={{
         width: `${size * 4}px`,
         height: `${size * 4}px`,
-        background: 'linear-gradient(135deg, rgb(var(--brand-500-rgb)), rgb(var(--brand-400-rgb)))',
+        background: 'linear-gradient(140deg, #00e5ff 0%, #3b82f6 55%, #8b5cf6 100%)',
       }}
     >
       <svg className="text-white" style={{ width: `${size * 2.5}px`, height: `${size * 2.5}px` }} fill="currentColor" viewBox="0 0 24 24">

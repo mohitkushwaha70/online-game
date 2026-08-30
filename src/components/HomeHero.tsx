@@ -30,22 +30,23 @@ export default function HomeHero({ initialGames, initialCategories }: HomeHeroPr
     return () => { cancelled = true; clearInterval(id); };
   }, []);
 
+  const stats = [
+    { value: totalGames, label: 'Games' },
+    { value: totalCategories, label: 'Categories' },
+    { value: 'Free', label: 'Forever' },
+  ];
+
   return (
-    <div className="flex items-center justify-center gap-4 sm:gap-10 mt-10 sm:mt-12 text-center">
-      <div>
-        <div className="text-base sm:text-2xl font-black text-white">{totalGames}</div>
-        <div className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Games</div>
-      </div>
-      <div className="w-px h-6 sm:h-8 bg-white/10" />
-      <div>
-        <div className="text-base sm:text-2xl font-black text-white">{totalCategories}</div>
-        <div className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Categories</div>
-      </div>
-      <div className="w-px h-6 sm:h-8 bg-white/10" />
-      <div>
-        <div className="text-base sm:text-2xl font-black text-white">Free</div>
-        <div className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Forever</div>
-      </div>
+    <div className="flex items-center justify-center gap-5 sm:gap-12 mt-10 sm:mt-14 text-center">
+      {stats.map((s, i) => (
+        <div key={s.label} className="flex items-center gap-5 sm:gap-12">
+          {i > 0 && <span className="w-px h-10 sm:h-12 bg-gradient-to-b from-transparent via-white/15 to-transparent" />}
+          <div>
+            <div className="font-display text-2xl sm:text-4xl font-bold text-white">{s.value}</div>
+            <div className="text-[10px] sm:text-xs text-dark-400 uppercase tracking-[0.2em] mt-1">{s.label}</div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

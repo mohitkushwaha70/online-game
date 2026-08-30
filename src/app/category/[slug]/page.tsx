@@ -5,11 +5,12 @@ import { use } from 'react';
 import Link from 'next/link';
 import GameCard from '@/components/game/GameCard';
 import { Game, Category } from '@/lib/types';
+import { formatNumber } from '@/lib/utils';
 
 const CATEGORY_COLORS: Record<string, string> = {
   action: '#FF6B35', adventure: '#00BBF9', racing: '#FEE440', puzzle: '#FF006E',
   shooting: '#3A86FF', sports: '#2EC4B6', io: '#7B2FF7', simulation: '#FF9F1C',
-  board: '#00F5D4', thinky: '#FF4365', word: '#C77DFF', horror: '#1a1a2e',
+  board: '#00F5D4', thinky: '#FF4365', word: '#C77DFF', horror: '#5c7cfa',
   strategy: '#9B5DE5', fighting: '#F15BB5', music: '#FFD166', idle: '#06D6A0',
 };
 
@@ -39,8 +40,8 @@ function CategoryContent({ params }: { params: Promise<{ slug: string }> }) {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('-totalPlays');
 
-  const color = CATEGORY_COLORS[slug] || '#7c3aed';
-  const desc = CATEGORY_DESC[slug] || `Browse the best ${slug} games`;
+  const color = category?.color || CATEGORY_COLORS[slug] || '#00e5ff';
+  const desc = category?.description || CATEGORY_DESC[slug] || `Browse the best ${slug} games`;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,36 +62,41 @@ function CategoryContent({ params }: { params: Promise<{ slug: string }> }) {
 
   return (
     <div className="min-h-screen bg-dark-950">
-      <section className="relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${color}22, transparent 60%)` }}>
-        <div className="absolute inset-0 bg-dark-950/60" />
-        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] rounded-full blur-[100px] animate-pulse" style={{ background: `${color}33`, animationDuration: '4s' }} />
+      <section className="relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${color}1f, transparent 60%)` }}>
+        <div className="absolute inset-0 bg-grid opacity-40" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] rounded-full blur-[110px] animate-pulse" style={{ background: `${color}2e`, animationDuration: '4s' }} />
+        <div className="absolute top-0 left-1/4 w-40 h-px bg-gradient-to-r from-transparent to-white/20" />
         <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-24 bg-gradient-to-t from-dark-950 to-transparent" />
 
-        <div className="relative max-w-7xl mx-auto px-4 py-10 sm:py-20">
-          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4 flex-wrap">
+        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 py-10 sm:py-20">
+          <nav className="flex items-center gap-2 text-xs sm:text-sm text-dark-300 mb-4 sm:mb-6 flex-wrap">
             <Link href="/" className="hover:text-white transition-colors">Home</Link>
-            <span>/</span>
-            <span className="text-white capitalize font-semibold">{category?.name || slug}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-8">
-            <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center text-xl sm:text-4xl font-black text-white shrink-0" style={{ background: `linear-gradient(135deg, ${color}, ${color}88)` }}>
+            <svg className="w-3.5 h-3.5 text-dark-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            <Link href="/category" className="hover:text-white transition-colors">Categories</Link>
+            <svg className="w-3.5 h-3.5 text-dark-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            <span className="text-white font-semibold capitalize">{category?.name || slug}</span>
+          </nav>
+
+          <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-8">
+            <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center text-2xl sm:text-4xl font-black text-white border border-white/10 shrink-0 shadow-card" style={{ background: `linear-gradient(135deg, ${color}, ${color}88)`, boxShadow: `0 0 0 1px ${color}33, 0 0 32px -10px ${color}66` }}>
               {slug[0].toUpperCase()}
             </div>
             <div className="flex-1">
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white capitalize">{category?.name || slug} Games</h1>
-              <p className="text-xs sm:text-base text-gray-400 mt-1 sm:mt-2 max-w-xl">{desc}</p>
-              <div className="flex items-center gap-3 sm:gap-4 mt-3 sm:mt-4 text-xs sm:text-sm">
+              <h1 className="font-display text-3xl sm:text-5xl font-bold text-white capitalize leading-tight">
+                {category?.name || slug} Games
+              </h1>
+              <p className="text-xs sm:text-base text-dark-300 mt-2 max-w-xl leading-relaxed">{desc}</p>
+              <div className="flex items-center gap-4 sm:gap-5 mt-4 text-xs sm:text-sm">
                 <div className="flex items-center gap-1.5">
                   <div className="w-1.5 h-1.5 rounded-full" style={{ background: color }} />
-                  <span className="text-gray-400">{games.length} games</span>
+                  <span className="text-dark-400">{games.length} games</span>
                 </div>
-                {category?.totalPlays ? (
+                {(category?.totalPlays || 0) > 0 && (
                   <div className="flex items-center gap-1.5">
-                    <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" /></svg>
-                    <span className="text-gray-400">{category.totalPlays.toLocaleString()} plays</span>
+                    <svg className="w-3.5 h-3.5 text-dark-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span className="text-dark-400">{formatNumber(category?.totalPlays || 0)} plays</span>
                   </div>
-                ) : null}
+                )}
               </div>
             </div>
           </div>
@@ -98,12 +104,13 @@ function CategoryContent({ params }: { params: Promise<{ slug: string }> }) {
       </section>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 pb-12 -mt-4 relative z-10">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 pb-14 -mt-4 relative z-10">
         {/* Sort */}
         <div className="flex justify-end mb-6">
-          <select value={sortBy} onChange={e => setSortBy(e.target.value)}
-            className="w-full sm:w-auto px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-gray-300 focus:outline-none focus:border-brand-500 min-h-[44px] appearance-none"
-            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '20px' }}>
+          <label className="sr-only" htmlFor="sort-select">Sort games</label>
+          <select id="sort-select" value={sortBy} onChange={e => setSortBy(e.target.value)}
+            className="w-full sm:w-auto px-4 py-2.5 bg-[#11141e] border border-white/[0.08] rounded-xl text-sm text-dark-200 focus:outline-none focus:border-[#00e5ff]/50 min-h-[44px] appearance-none cursor-pointer transition-colors"
+            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236d7687'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', backgroundSize: '18px' }}>
             <option value="-totalPlays">Most Popular</option>
             <option value="-createdAt">Newest</option>
             <option value="-rating">Top Rated</option>
@@ -113,13 +120,13 @@ function CategoryContent({ params }: { params: Promise<{ slug: string }> }) {
 
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-            {Array.from({ length: 10 }).map((_, i) => <div key={i} className="skeleton aspect-[3/4] rounded-xl" />)}
+            {Array.from({ length: 10 }).map((_, i) => <div key={i} className="skeleton aspect-[3/4] rounded-2xl" />)}
           </div>
         ) : games.length === 0 ? (
-          <div className="text-center py-16">
+          <div className="card-panel rounded-2xl py-16 px-4 text-center">
             <div className="text-5xl mb-4 opacity-30">🎮</div>
-            <p className="text-gray-400 text-lg mb-4">No games in this category yet</p>
-            <Link href="/" className="px-6 py-3 bg-gradient-to-r from-brand-500 to-brand-400 text-white rounded-xl hover:shadow-lg transition-all min-h-[44px] inline-flex items-center font-semibold">
+            <p className="text-dark-300 text-lg mb-4">No games in this category yet</p>
+            <Link href="/" className="px-6 py-3 text-white font-semibold rounded-xl bg-gradient-to-r from-[#00e5ff]/85 to-[#8b5cf6]/85 hover:from-[#00e5ff] hover:to-[#8b5cf6] transition-all duration-200 min-h-[44px] inline-flex items-center">
               Browse All Games
             </Link>
           </div>
@@ -136,10 +143,10 @@ function CategoryContent({ params }: { params: Promise<{ slug: string }> }) {
 export default function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-dark-950 px-4 py-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="min-h-screen bg-dark-950 px-4 sm:px-6 py-8">
+        <div className="max-w-[1400px] mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-            {Array.from({ length: 10 }).map((_, i) => <div key={i} className="skeleton aspect-[3/4] rounded-xl" />)}
+            {Array.from({ length: 10 }).map((_, i) => <div key={i} className="skeleton aspect-[3/4] rounded-2xl" />)}
           </div>
         </div>
       </div>
